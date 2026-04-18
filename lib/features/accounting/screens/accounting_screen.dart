@@ -269,7 +269,7 @@ class _InvoiceStatusBadge extends StatelessWidget {
         border: Border.all(color: color.withAlpha(100)),
       ),
       child: Text(
-        invoice.statusLabel,
+        status.name.toUpperCase(),
         style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );

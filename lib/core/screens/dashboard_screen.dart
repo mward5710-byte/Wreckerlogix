@@ -156,7 +156,7 @@ class DashboardScreen extends StatelessWidget {
   int _getCrossAxisCount(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     if (width > 900) return 3;
-    if (width > 600) return 3;
+    if (width > 600) return 2;
     return 2;
   }
 }
