@@ -8,7 +8,10 @@ import 'package:wreckerlogix/features/gps/providers/gps_provider.dart';
 import 'package:wreckerlogix/features/voice_commands/providers/voice_command_provider.dart';
 import 'package:wreckerlogix/features/photo_docs/providers/photo_doc_provider.dart';
 import 'package:wreckerlogix/features/photo_docs/models/photo_doc.dart';
+import 'package:wreckerlogix/features/notifications/models/notification_item.dart';
+import 'package:wreckerlogix/features/notifications/providers/notification_provider.dart';
 import 'package:wreckerlogix/core/services/auth_service.dart';
+import 'package:wreckerlogix/core/services/firebase_options.dart';
 
 void main() {
   group('DispatchProvider', () {
@@ -253,6 +256,137 @@ void main() {
       expect(result, true);
       expect(auth.displayName, 'New User');
       expect(auth.role, 'driver');
+    });
+  });
+
+  group('NotificationProvider', () {
+    late NotificationProvider provider;
+
+    setUp(() {
+      provider = NotificationProvider();
+    });
+
+    test('initializes with sample notifications', () {
+      expect(provider.notifications, isNotEmpty);
+    });
+
+    test('has unread notifications', () {
+      expect(provider.unreadCount, greaterThan(0));
+    });
+
+    test('marks a notification as read', () {
+      final unread =
+          provider.notifications.firstWhere((n) => !n.isRead);
+      provider.markAsRead(unread.id);
+      final updated =
+          provider.notifications.firstWhere((n) => n.id == unread.id);
+      expect(updated.isRead, true);
+    });
+
+    test('marks all as read', () {
+      provider.markAllAsRead();
+      expect(provider.unreadCount, 0);
+    });
+
+    test('pushes a new job alert', () {
+      final initialCount = provider.notifications.length;
+      provider.pushNewJobAlert(
+        jobId: 'job-test',
+        customerName: 'Test Customer',
+        towType: 'Flatbed',
+        pickupAddress: '123 Test St',
+      );
+      expect(provider.notifications.length, initialCount + 1);
+      expect(provider.notifications.first.type, NotificationType.newJob);
+    });
+
+    test('pushes an emergency alert', () {
+      provider.pushNewJobAlert(
+        jobId: 'job-emerg',
+        customerName: 'Emergency Customer',
+        towType: 'Heavy Duty',
+        pickupAddress: 'I-55 Crash',
+        isEmergency: true,
+      );
+      expect(
+          provider.notifications.first.type, NotificationType.emergency);
+      expect(provider.notifications.first.priority,
+          NotificationPriority.critical);
+    });
+
+    test('pushes status change alert', () {
+      provider.pushStatusChangeAlert(
+        jobId: 'job-001',
+        driverName: 'Mike',
+        newStatus: 'En Route',
+      );
+      expect(provider.notifications.first.type,
+          NotificationType.statusChange);
+    });
+
+    test('pushes job completed alert', () {
+      provider.pushJobCompletedAlert(
+        jobId: 'job-001',
+        customerName: 'Test',
+        driverName: 'Mike',
+      );
+      expect(provider.notifications.first.type,
+          NotificationType.jobCompleted);
+    });
+
+    test('pushes payment alert', () {
+      provider.pushPaymentAlert(
+        invoiceId: 'inv-001',
+        customerName: 'Lisa',
+        amount: 102.60,
+      );
+      expect(provider.notifications.first.type,
+          NotificationType.invoicePaid);
+    });
+
+    test('pushes driver check-in alert', () {
+      provider.pushDriverCheckInAlert(
+        driverName: 'Jake',
+        action: 'clocked in',
+      );
+      expect(provider.notifications.first.type,
+          NotificationType.driverCheckIn);
+    });
+
+    test('deletes a notification', () {
+      final initialCount = provider.notifications.length;
+      final id = provider.notifications.first.id;
+      provider.deleteNotification(id);
+      expect(provider.notifications.length, initialCount - 1);
+    });
+
+    test('clears all notifications', () {
+      provider.clearAll();
+      expect(provider.notifications, isEmpty);
+    });
+  });
+
+  group('FirebaseConfig', () {
+    test('is not configured by default', () {
+      expect(FirebaseConfig.isConfigured, false);
+    });
+  });
+
+  group('AuthService Firebase mode', () {
+    late AuthService auth;
+
+    setUp(() {
+      auth = AuthService();
+    });
+
+    test('reports firebase not active when unconfigured', () {
+      expect(auth.isFirebaseActive, false);
+    });
+
+    test('sign in works in dev mode', () async {
+      final result = await auth.signIn('test@test.com', 'password');
+      expect(result, true);
+      expect(auth.isAuthenticated, true);
     });
   });
 }

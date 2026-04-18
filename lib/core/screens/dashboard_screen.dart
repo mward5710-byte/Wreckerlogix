@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../../features/notifications/providers/notification_provider.dart';
 
 /// Main dashboard — hub for all WreckerLogix modules.
 class DashboardScreen extends StatelessWidget {
@@ -13,6 +14,43 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('WreckerLogix'),
         actions: [
+          // Notification bell with unread badge
+          Consumer<NotificationProvider>(
+            builder: (context, notifs, _) => Stack(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.notifications_outlined),
+                  onPressed: () => context.push('/notifications'),
+                  tooltip: 'Notifications',
+                ),
+                if (notifs.unreadCount > 0)
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        '${notifs.unreadCount}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
           Consumer<AuthService>(
             builder: (context, auth, _) {
               if (auth.isAuthenticated) {
@@ -113,6 +151,18 @@ class DashboardScreen extends StatelessWidget {
                     color: const Color(0xFF558B2F),
                     onTap: () => context.push('/accounting'),
                   ),
+                  Consumer<NotificationProvider>(
+                    builder: (context, notifs, _) => _ModuleCard(
+                      title: 'Notifications',
+                      subtitle: notifs.unreadCount > 0
+                          ? '${notifs.unreadCount} unread alerts'
+                          : 'Dispatch alerts & activity',
+                      icon: Icons.notifications_active,
+                      color: const Color(0xFFC62828),
+                      badgeCount: notifs.unreadCount,
+                      onTap: () => context.push('/notifications'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -167,6 +217,7 @@ class _ModuleCard extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
+  final int badgeCount;
 
   const _ModuleCard({
     required this.title,
@@ -174,6 +225,7 @@ class _ModuleCard extends StatelessWidget {
     required this.icon,
     required this.color,
     required this.onTap,
+    this.badgeCount = 0,
   });
 
   @override
@@ -190,26 +242,51 @@ class _ModuleCard extends StatelessWidget {
               colors: [color, color.withAlpha(180)],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 40, color: Colors.white),
-                const SizedBox(height: 8),
-                Text(title,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center),
-                const SizedBox(height: 4),
-                Text(subtitle,
-                    style: TextStyle(
-                        color: Colors.white.withAlpha(220), fontSize: 11),
-                    textAlign: TextAlign.center),
-              ],
-            ),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(icon, size: 40, color: Colors.white),
+                    const SizedBox(height: 8),
+                    Text(title,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center),
+                    const SizedBox(height: 4),
+                    Text(subtitle,
+                        style: TextStyle(
+                            color: Colors.white.withAlpha(220), fontSize: 11),
+                        textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+              if (badgeCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '$badgeCount',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),

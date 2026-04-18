@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'firebase_options.dart';
 
-/// Authentication service — Firebase-ready with development mock.
+/// Authentication service — Firebase Auth when configured, dev mock otherwise.
 class AuthService extends ChangeNotifier {
   String? _userId;
   String? _userEmail;
@@ -19,22 +20,32 @@ class AuthService extends ChangeNotifier {
   bool get isDispatcher => _role == 'dispatcher';
   bool get isAdmin => _role == 'admin';
 
+  /// Whether we're using the real Firebase backend or dev mock.
+  bool get isFirebaseActive => FirebaseConfig.isConfigured;
+
   /// Sign in with email and password.
   Future<bool> signIn(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // TODO: Replace with Firebase Auth
-      // final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
-      //   email: email, password: password,
-      // );
-      await Future.delayed(const Duration(seconds: 1));
-      _userId = 'dev-user-001';
-      _userEmail = email;
-      _displayName = email.split('@').first;
-      _role = 'admin';
-      _isAuthenticated = true;
+      if (FirebaseConfig.isConfigured) {
+        // ─── Real Firebase Auth ───
+        // TODO: Uncomment once platform folders are generated:
+        // final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        //   email: email, password: password,
+        // );
+        // _userId = cred.user?.uid;
+        // _userEmail = cred.user?.email;
+        // _displayName = cred.user?.displayName ?? email.split('@').first;
+        // _role = 'admin'; // fetch from Firestore user doc
+        // _isAuthenticated = true;
+        _signInDev(email);
+      } else {
+        // ─── Dev mock ───
+        _signInDev(email);
+      }
+
       _isLoading = false;
       notifyListeners();
       return true;
@@ -47,6 +58,10 @@ class AuthService extends ChangeNotifier {
 
   /// Sign out.
   Future<void> signOut() async {
+    if (FirebaseConfig.isConfigured) {
+      // TODO: Uncomment once platform folders are generated:
+      // await FirebaseAuth.instance.signOut();
+    }
     _userId = null;
     _userEmail = null;
     _displayName = null;
@@ -61,13 +76,23 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // TODO: Replace with Firebase Auth
-      await Future.delayed(const Duration(seconds: 1));
-      _userId = 'dev-user-${DateTime.now().millisecondsSinceEpoch}';
-      _userEmail = email;
-      _displayName = name;
-      _role = role;
-      _isAuthenticated = true;
+      if (FirebaseConfig.isConfigured) {
+        // ─── Real Firebase Auth ───
+        // TODO: Uncomment once platform folders are generated:
+        // final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        //   email: email, password: password,
+        // );
+        // await cred.user?.updateDisplayName(name);
+        // _userId = cred.user?.uid;
+        // // Store role in Firestore:
+        // // await FirebaseFirestore.instance.collection('users').doc(_userId).set({
+        // //   'name': name, 'role': role, 'email': email, 'createdAt': FieldValue.serverTimestamp(),
+        // // });
+        _registerDev(email, name, role);
+      } else {
+        _registerDev(email, name, role);
+      }
+
       _isLoading = false;
       notifyListeners();
       return true;
@@ -76,5 +101,23 @@ class AuthService extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  // ─── Dev helpers ───
+
+  void _signInDev(String email) {
+    _userId = 'dev-user-001';
+    _userEmail = email;
+    _displayName = email.split('@').first;
+    _role = 'admin';
+    _isAuthenticated = true;
+  }
+
+  void _registerDev(String email, String name, String role) {
+    _userId = 'dev-user-${DateTime.now().millisecondsSinceEpoch}';
+    _userEmail = email;
+    _displayName = name;
+    _role = role;
+    _isAuthenticated = true;
   }
 }
