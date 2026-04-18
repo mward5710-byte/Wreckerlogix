@@ -49,6 +49,13 @@ jobs:
       - name: Generate platform folders
         run: flutter create . --project-name wreckerlogix --org com.wreckerlogix
 
+      - name: Set iOS deployment target
+        run: |
+          # Firebase packages require iOS 13.0+; set platform in Podfile
+          sed -i '' "s/# platform :ios, '.*'/platform :ios, '13.0'/" ios/Podfile
+          # If the sed didn't match (uncommented line), force it
+          grep -q "^platform :ios" ios/Podfile || sed -i '' '1s/^/platform :ios, '\''13.0'\''\n/' ios/Podfile
+
       - name: Install dependencies
         run: flutter pub get
 
