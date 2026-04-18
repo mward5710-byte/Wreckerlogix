@@ -9,6 +9,7 @@ import '../../features/time_tracking/screens/time_tracking_screen.dart';
 import '../../features/accounting/screens/accounting_screen.dart';
 import '../../features/accounting/screens/create_invoice_screen.dart';
 import '../../features/notifications/screens/notification_screen.dart';
+import '../../features/driver_panel/screens/driver_panel_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/login_screen.dart';
 
@@ -68,6 +69,10 @@ class AppRouter {
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationScreen(),
+      ),
+      GoRoute(
+        path: '/driver-panel',
+        builder: (context, state) => const DriverPanelScreen(),
       ),
     ],
   );

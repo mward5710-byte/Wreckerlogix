@@ -12,6 +12,7 @@ import 'package:wreckerlogix/features/notifications/models/notification_item.dar
 import 'package:wreckerlogix/features/notifications/providers/notification_provider.dart';
 import 'package:wreckerlogix/core/services/auth_service.dart';
 import 'package:wreckerlogix/core/services/firebase_options.dart';
+import 'package:wreckerlogix/features/driver_panel/providers/driver_panel_provider.dart';
 
 void main() {
   group('DispatchProvider', () {
@@ -387,6 +388,103 @@ void main() {
       final result = await auth.signIn('test@test.com', 'password');
       expect(result, true);
       expect(auth.isAuthenticated, true);
+    });
+  });
+
+  group('DriverPanelProvider', () {
+    late DriverPanelProvider panel;
+
+    setUp(() {
+      panel = DriverPanelProvider();
+    });
+
+    test('starts off duty', () {
+      expect(panel.mode, DriverMode.offDuty);
+      expect(panel.isClockedIn, false);
+      expect(panel.hasActiveJob, false);
+    });
+
+    test('clocks in', () {
+      panel.clockIn();
+      expect(panel.isClockedIn, true);
+      expect(panel.mode, DriverMode.available);
+      expect(panel.clockInTime, isNotNull);
+    });
+
+    test('clocks out', () {
+      panel.clockIn();
+      panel.clockOut();
+      expect(panel.isClockedIn, false);
+      expect(panel.mode, DriverMode.offDuty);
+    });
+
+    test('loads a job', () {
+      panel.clockIn();
+      panel.loadJob(
+        jobId: 'test-job',
+        customer: 'Test Customer',
+        pickup: '123 Test St',
+        dropoff: '456 Drop Ave',
+        vehicle: '2020 Honda Civic',
+      );
+      expect(panel.hasActiveJob, true);
+      expect(panel.mode, DriverMode.onJob);
+      expect(panel.currentJobCustomer, 'Test Customer');
+      expect(panel.currentJobStatus, 'Assigned');
+    });
+
+    test('progresses through job statuses', () {
+      panel.clockIn();
+      panel.loadJob(
+        jobId: 'test-job',
+        customer: 'Test',
+        pickup: '123 St',
+        dropoff: '456 Ave',
+        vehicle: '2020 Car',
+      );
+
+      panel.goEnRoute();
+      expect(panel.currentJobStatus, 'En Route');
+
+      panel.arriveOnScene();
+      expect(panel.currentJobStatus, 'On Scene');
+
+      panel.startTow();
+      expect(panel.currentJobStatus, 'In Progress');
+
+      final jobsBefore = panel.todayJobsCompleted;
+      panel.completeJob();
+      expect(panel.currentJobStatus, 'Completed');
+      expect(panel.todayJobsCompleted, jobsBefore + 1);
+      expect(panel.mode, DriverMode.available);
+    });
+
+    test('clears completed job', () {
+      panel.clockIn();
+      panel.acceptDemoJob();
+      panel.completeJob();
+      panel.clearCompletedJob();
+      expect(panel.hasActiveJob, false);
+      expect(panel.currentJobId, isNull);
+    });
+
+    test('accepts demo job', () {
+      panel.clockIn();
+      panel.acceptDemoJob();
+      expect(panel.hasActiveJob, true);
+      expect(panel.currentJobCustomer, 'Sarah Johnson');
+    });
+
+    test('tracks today stats', () {
+      expect(panel.todayJobsCompleted, greaterThanOrEqualTo(0));
+      expect(panel.todayEarnings, greaterThanOrEqualTo(0));
+      expect(panel.todayMiles, greaterThanOrEqualTo(0));
+    });
+
+    test('formats hours worked', () {
+      expect(panel.hoursWorkedToday, '0:00');
+      panel.clockIn();
+      expect(panel.hoursWorkedToday, isNotEmpty);
     });
   });
 }

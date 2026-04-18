@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../../features/notifications/providers/notification_provider.dart';
+import '../../features/driver_panel/providers/driver_panel_provider.dart';
 
 /// Main dashboard — hub for all WreckerLogix modules.
 class DashboardScreen extends StatelessWidget {
@@ -109,6 +110,20 @@ class DashboardScreen extends StatelessWidget {
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.2,
                 children: [
+                  Consumer<DriverPanelProvider>(
+                    builder: (context, panel, _) => _ModuleCard(
+                      title: 'Driver Panel',
+                      subtitle: panel.isClockedIn
+                          ? 'On duty • ${panel.hoursWorkedToday}'
+                          : 'Tap to clock in',
+                      icon: Icons.local_shipping,
+                      color: panel.isClockedIn
+                          ? const Color(0xFF2E7D32)
+                          : const Color(0xFF37474F),
+                      badgeCount: panel.hasActiveJob ? 1 : 0,
+                      onTap: () => context.push('/driver-panel'),
+                    ),
+                  ),
                   _ModuleCard(
                     title: 'Dispatch',
                     subtitle: 'Job management & assignment',
