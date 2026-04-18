@@ -1,0 +1,53 @@
+name: wreckerlogix
+description: AI-Powered Tow Industry Operations Platform — dispatch, GPS tracking, voice commands, photo documentation, time tracking, and accounting.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  provider: ^6.1.1
+
+  # Navigation
+  go_router: ^14.0.0
+
+  # Firebase (Backend & Auth)
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+  firebase_storage: ^12.0.0
+
+  # GPS & Maps
+  geolocator: ^12.0.0
+  google_maps_flutter: ^2.6.0
+  geocoding: ^3.0.0
+
+  # Camera & Photo
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+
+  # Voice / Speech
+  speech_to_text: ^7.0.0
+  flutter_tts: ^4.0.0
+
+  # UI & Utilities
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  flutter_local_notifications: ^17.0.0
+  shared_preferences: ^2.2.2
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
