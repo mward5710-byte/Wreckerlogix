@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1976D2"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+    <linearGradient id="armGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FF8F00"/>
+      <stop offset="100%" stop-color="#F57C00"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1565C0"/>
+      <stop offset="100%" stop-color="#0D47A1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="250" fill="url(#bgGrad)"/>
+
+  <!-- Truck body — rear/side view -->
+  <!-- Main truck bed -->
+  <rect x="80" y="260" width="280" height="90" rx="8" fill="url(#bodyGrad)" stroke="#0D47A1" stroke-width="3"/>
+
+  <!-- Cab (front of truck, right side) -->
+  <path d="M 340 240 L 395 240 Q 410 240 410 255 L 410 350 Q 410 355 405 355 L 340 355 Z" fill="#1565C0" stroke="#0D47A1" stroke-width="3"/>
+
+  <!-- Cab window -->
+  <path d="M 350 248 L 390 248 Q 400 248 400 258 L 400 290 L 350 290 Z" fill="#B3E5FC" stroke="#0288D1" stroke-width="2" opacity="0.9"/>
+
+  <!-- Truck flatbed surface -->
+  <rect x="75" y="252" width="270" height="14" rx="3" fill="#455A64"/>
+
+  <!-- Rear bumper -->
+  <rect x="68" y="340" width="30" height="18" rx="4" fill="#B0BEC5" stroke="#78909C" stroke-width="2"/>
+
+  <!-- Tail lights -->
+  <rect x="72" y="300" width="12" height="20" rx="3" fill="#F44336"/>
+  <rect x="72" y="324" width="12" height="12" rx="3" fill="#FF8F00"/>
+
+  <!-- Boom arm base (turntable on the bed) -->
+  <rect x="160" y="232" width="50" height="28" rx="6" fill="#546E7A" stroke="#37474F" stroke-width="2"/>
+
+  <!-- Boom arm — raised at an angle -->
+  <path d="M 185 240 L 130 120" stroke="url(#armGrad)" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Boom arm second segment — angled out -->
+  <path d="M 130 120 L 100 100" stroke="#FF8F00" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Hydraulic cylinder on boom -->
+  <path d="M 195 248 L 155 155" stroke="#78909C" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Boom tip / pulley housing -->
+  <circle cx="100" cy="100" r="12" fill="#455A64" stroke="#37474F" stroke-width="2"/>
+  <circle cx="100" cy="100" r="5" fill="#78909C"/>
+
+  <!-- Chain / cable from boom tip -->
+  <path d="M 100 112 L 100 145 L 102 150 L 98 158 L 102 166 L 98 174 L 100 180" stroke="#B0BEC5" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Hook -->
+  <path d="M 100 178 Q 100 205 118 205 Q 128 205 128 195 Q 128 186 118 186 L 108 186" stroke="#FF8F00" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- Hook tip point -->
+  <circle cx="100" cy="178" r="4" fill="#FFA726"/>
+
+  <!-- Wheels -->
+  <!-- Rear axle wheels (dual) -->
+  <circle cx="150" cy="370" r="32" fill="#37474F" stroke="#263238" stroke-width="3"/>
+  <circle cx="150" cy="370" r="18" fill="#546E7A"/>
+  <circle cx="150" cy="370" r="8" fill="#37474F"/>
+  <!-- Rear inner wheel -->
+  <circle cx="180" cy="370" r="32" fill="#37474F" stroke="#263238" stroke-width="3"/>
+  <circle cx="180" cy="370" r="18" fill="#546E7A"/>
+  <circle cx="180" cy="370" r="8" fill="#37474F"/>
+
+  <!-- Front wheel -->
+  <circle cx="370" cy="370" r="32" fill="#37474F" stroke="#263238" stroke-width="3"/>
+  <circle cx="370" cy="370" r="18" fill="#546E7A"/>
+  <circle cx="370" cy="370" r="8" fill="#37474F"/>
+
+  <!-- Ground line -->
+  <line x1="60" y1="402" x2="440" y2="402" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+
+  <!-- Warning lights on top of cab -->
+  <rect x="348" y="230" width="55" height="12" rx="6" fill="#FF8F00" opacity="0.9"/>
+  <circle cx="358" cy="236" r="4" fill="#FFEB3B"/>
+  <circle cx="375" cy="236" r="4" fill="#FFEB3B"/>
+  <circle cx="392" cy="236" r="4" fill="#FFEB3B"/>
+
+  <!-- "WL" text badge on truck body -->
+  <text x="240" y="320" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="bold" fill="white" text-anchor="middle" opacity="0.9">WL</text>
+</svg>
