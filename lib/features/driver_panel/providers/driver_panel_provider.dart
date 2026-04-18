@@ -138,7 +138,7 @@ class DriverPanelProvider extends ChangeNotifier {
       jobId: 'job-demo-${DateTime.now().millisecondsSinceEpoch}',
       customer: 'Sarah Johnson',
       pickup: '1234 Oak Street, Springfield, IL',
-      dropoff: "Mike's Auto Shop, 567 Main St",
+      dropoff: 'Mike\'s Auto Shop, 567 Main St',
       vehicle: '2019 Honda Civic (Silver)',
     );
   }
