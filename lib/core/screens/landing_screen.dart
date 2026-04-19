@@ -392,7 +392,7 @@ class LandingScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () => context.go('/'),
+              onPressed: () => context.go('/login'),
               child: const Text(
                 'Get Started',
                 style: TextStyle(
