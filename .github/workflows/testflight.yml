@@ -16,12 +16,22 @@ name: TestFlight Deploy
 #    - APP_STORE_CONNECT_KEY_ID     : Key ID from App Store Connect
 #
 # HOW TO GET THESE:
-# 1. Go to developer.apple.com → Certificates, IDs & Profiles
-# 2. Create a Distribution Certificate → export as .p12
-# 3. Run: base64 -i certificate.p12 | pbcopy → paste as APPLE_CERTIFICATES_P12
-# 4. Create an App Store Connect API key:
-#    App Store Connect → Users & Access → Keys → Generate API Key
-# 5. Download the .p8 key file
+#
+# Option A — No Mac required (recommended):
+#   Run the "Generate iOS Signing Certificate" workflow (generate-certificate.yml)
+#   It runs on macOS CI and walks you through a 2-phase process:
+#   Phase 1: generates a CSR → you upload to developer.apple.com
+#   Phase 2: packages the .p12 → you copy to GitHub Secrets
+#
+# Option B — From a Mac:
+#   1. Go to developer.apple.com → Certificates, IDs & Profiles
+#   2. Create a Distribution Certificate → export as .p12
+#   3. Run: base64 -i certificate.p12 | pbcopy → paste as APPLE_CERTIFICATES_P12
+#
+# App Store Connect API Key (both options):
+#   1. Go to App Store Connect → Users & Access → Integrations → Keys
+#   2. Generate API Key (Admin role) → download the .p8 file
+#   3. Note the Key ID and Issuer ID shown on the page
 # ────────────────────────────────────────────────────────────────────
 
 on:
