@@ -164,7 +164,7 @@ class CrashDetectionProvider extends ChangeNotifier {
         notes: 'Rear-ended at stoplight. Minor vehicle damage, no injuries.',
         autoAlertSent: true,
         respondedAt:
-            DateTime.now().subtract(const Duration(days: 3, minutes: -8)),
+            DateTime.now().subtract(const Duration(days: 2, hours: 23, minutes: 52)),
       ),
       CrashEvent(
         id: 'crash-002',
@@ -195,7 +195,7 @@ class CrashDetectionProvider extends ChangeNotifier {
         notes: 'Side collision on highway. Driver treated on scene.',
         autoAlertSent: true,
         respondedAt:
-            DateTime.now().subtract(const Duration(days: 14, minutes: -5)),
+            DateTime.now().subtract(const Duration(days: 13, hours: 23, minutes: 55)),
       ),
       CrashEvent(
         id: 'crash-004',
@@ -212,7 +212,7 @@ class CrashDetectionProvider extends ChangeNotifier {
         notes: 'Head-on collision. Driver hospitalized, full recovery.',
         autoAlertSent: true,
         respondedAt:
-            DateTime.now().subtract(const Duration(days: 30, minutes: -3)),
+            DateTime.now().subtract(const Duration(days: 29, hours: 23, minutes: 57)),
       ),
     ]);
   }
