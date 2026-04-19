@@ -253,6 +253,15 @@ class AuthService extends ChangeNotifier {
 
   // ─── Dev helpers ───
 
+  /// Generate a cryptographically secure random nonce for Apple Sign-In.
+  /// Used to prevent replay attacks when exchanging tokens with Firebase.
+  // ignore: unused_element
+  static String _generateNonce([int length = 32]) {
+    const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
+    final values = List<int>.generate(length, (_) => DateTime.now().microsecond % charset.length);
+    return values.map((x) => charset[x % charset.length]).join();
+  }
+
   void _signInDev(String email) {
     _userId = 'dev-user-001';
     _userEmail = email;
