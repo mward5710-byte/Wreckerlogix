@@ -156,10 +156,10 @@ class MaintenanceScreen extends StatelessWidget {
                 }
                 final provider =
                     Provider.of<MaintenanceProvider>(context, listen: false);
+                final ts = DateTime.now().millisecondsSinceEpoch;
                 provider.addRecord(MaintenanceRecord(
-                  id: 'maint-${DateTime.now().millisecondsSinceEpoch}',
-                  vehicleId:
-                      'VH-${vehicleController.text.trim().hashCode.abs() % 1000}',
+                  id: 'maint-$ts',
+                  vehicleId: 'VH-$ts',
                   vehicleLabel: vehicleController.text.trim(),
                   type: selectedType,
                   description: descController.text.trim(),
