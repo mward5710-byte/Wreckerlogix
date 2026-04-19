@@ -51,6 +51,7 @@ class AssistanceRequest {
     DateTime? estimatedArrival,
     DateTime? completedAt,
     String? notes,
+    double? estimatedCost,
   }) {
     return AssistanceRequest(
       id: id,
@@ -69,7 +70,7 @@ class AssistanceRequest {
       requestedAt: requestedAt,
       estimatedArrival: estimatedArrival ?? this.estimatedArrival,
       completedAt: completedAt ?? this.completedAt,
-      estimatedCost: estimatedCost,
+      estimatedCost: estimatedCost ?? this.estimatedCost,
     );
   }
 

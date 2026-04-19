@@ -93,6 +93,7 @@ class RoadsideAssistanceProvider extends ChangeNotifier {
     _requests[index] = _requests[index].copyWith(
       status: RequestStatus.completed,
       completedAt: DateTime.now(),
+      estimatedCost: finalCost,
     );
     notifyListeners();
   }
