@@ -174,29 +174,31 @@ class FounderScreen extends StatelessWidget {
   // ──────────────────────────── CTA Button ──────────────────────
 
   Widget _buildLetsTalkButton() {
-    return SizedBox(
-      width: 220,
-      height: 52,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: _accentRed,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+    return Builder(
+      builder: (context) => SizedBox(
+        width: 220,
+        height: 52,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _accentRed,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+          onPressed: () => _launchEmail(context),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Let's Talk"),
+              SizedBox(width: 8),
+              Icon(Icons.arrow_forward, size: 20),
+            ],
           ),
-        ),
-        onPressed: _launchEmail,
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Let's Talk"),
-            SizedBox(width: 8),
-            Icon(Icons.arrow_forward, size: 20),
-          ],
         ),
       ),
     );
@@ -204,10 +206,24 @@ class FounderScreen extends StatelessWidget {
 
   // ──────────────────────────── Actions ─────────────────────────
 
-  Future<void> _launchEmail() async {
+  Future<void> _launchEmail(BuildContext context) async {
     final uri = Uri(scheme: 'mailto', path: _contactEmail);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Could not open email client')),
+          );
+        }
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open email client')),
+        );
+      }
     }
   }
 }
