@@ -15,6 +15,12 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('WreckerLogix'),
         actions: [
+          // About / Founder page
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => context.push('/about'),
+            tooltip: 'About the Founder',
+          ),
           // Notification bell with unread badge
           Consumer<NotificationProvider>(
             builder: (context, notifs, _) => Stack(
