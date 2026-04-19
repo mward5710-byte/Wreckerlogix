@@ -11,8 +11,10 @@ import 'features/time_tracking/providers/time_tracking_provider.dart';
 import 'features/accounting/providers/accounting_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/driver_panel/providers/driver_panel_provider.dart';
+import 'features/eld/providers/eld_provider.dart';
 import 'features/crash_detection/providers/crash_detection_provider.dart';
 import 'features/dash_cam/providers/dash_cam_provider.dart';
+import 'features/roadside_assistance/providers/roadside_assistance_provider.dart';
 import 'features/maintenance/providers/maintenance_provider.dart';
 import 'features/ai_assistant/providers/ai_assistant_provider.dart';
 import 'core/services/auth_service.dart';
@@ -49,8 +51,10 @@ class WreckerLogixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AccountingProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => DriverPanelProvider()),
+        ChangeNotifierProvider(create: (_) => EldProvider()),
         ChangeNotifierProvider(create: (_) => CrashDetectionProvider()),
         ChangeNotifierProvider(create: (_) => DashCamProvider()),
+        ChangeNotifierProvider(create: (_) => RoadsideAssistanceProvider()),
         ChangeNotifierProvider(create: (_) => MaintenanceProvider()),
         ChangeNotifierProvider(create: (_) => AiAssistantProvider()),
       ],

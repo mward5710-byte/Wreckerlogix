@@ -13,6 +13,18 @@ import 'package:wreckerlogix/features/notifications/providers/notification_provi
 import 'package:wreckerlogix/core/services/auth_service.dart';
 import 'package:wreckerlogix/core/services/firebase_options.dart';
 import 'package:wreckerlogix/features/driver_panel/providers/driver_panel_provider.dart';
+import 'package:wreckerlogix/features/eld/models/eld_log.dart';
+import 'package:wreckerlogix/features/eld/providers/eld_provider.dart';
+import 'package:wreckerlogix/features/crash_detection/models/crash_event.dart';
+import 'package:wreckerlogix/features/crash_detection/providers/crash_detection_provider.dart';
+import 'package:wreckerlogix/features/dash_cam/models/dash_cam_clip.dart';
+import 'package:wreckerlogix/features/dash_cam/providers/dash_cam_provider.dart';
+import 'package:wreckerlogix/features/roadside_assistance/models/assistance_request.dart';
+import 'package:wreckerlogix/features/roadside_assistance/providers/roadside_assistance_provider.dart';
+import 'package:wreckerlogix/features/maintenance/models/maintenance_record.dart';
+import 'package:wreckerlogix/features/maintenance/providers/maintenance_provider.dart';
+import 'package:wreckerlogix/features/ai_assistant/models/ai_message.dart';
+import 'package:wreckerlogix/features/ai_assistant/providers/ai_assistant_provider.dart';
 
 void main() {
   group('DispatchProvider', () {
@@ -485,6 +497,368 @@ void main() {
       expect(panel.hoursWorkedToday, '0:00');
       panel.clockIn();
       expect(panel.hoursWorkedToday, isNotEmpty);
+    });
+  });
+
+  group('EldProvider', () {
+    late EldProvider provider;
+
+    setUp(() {
+      provider = EldProvider();
+    });
+
+    test('initializes with sample logs', () {
+      expect(provider.logs, isNotEmpty);
+    });
+
+    test('starts with ELD connected', () {
+      expect(provider.eldConnected, true);
+      expect(provider.eldDeviceId, isNotNull);
+    });
+
+    test('connects and disconnects device', () {
+      provider.disconnectDevice();
+      expect(provider.eldConnected, false);
+      expect(provider.eldDeviceId, isNull);
+
+      provider.connectDevice('ELD-TEST-001');
+      expect(provider.eldConnected, true);
+      expect(provider.eldDeviceId, 'ELD-TEST-001');
+    });
+
+    test('changes duty status', () {
+      final initialCount = provider.logs.length;
+      provider.changeDutyStatus(DutyStatus.driving, annotation: 'Test drive');
+      expect(provider.currentStatus, DutyStatus.driving);
+      expect(provider.logs.length, initialCount + 1);
+      expect(provider.logs.last.annotation, 'Test drive');
+    });
+
+    test('adds intermediate log', () {
+      final initialCount = provider.logs.length;
+      provider.addIntermediateLog(lat: 40.0, lng: -89.0, odometer: 105000.0);
+      expect(provider.logs.length, initialCount + 1);
+      expect(provider.logs.last.eventType, EldEventType.intermediateLog);
+    });
+
+    test('certifies a log', () {
+      final uncertified = provider.logs.where((l) => !l.certified).toList();
+      if (uncertified.isNotEmpty) {
+        provider.certifyLog(uncertified.first.id);
+        final updated = provider.logs.firstWhere(
+            (l) => l.id == uncertified.first.id);
+        expect(updated.certified, true);
+      }
+    });
+
+    test('filters logs by driver', () {
+      final driverLogs = provider.getLogsForDriver('drv-001');
+      expect(driverLogs, isNotEmpty);
+      expect(driverLogs.every((l) => l.driverId == 'drv-001'), true);
+    });
+
+    test('HOS summary has valid values', () {
+      expect(provider.hosSummary.drivingHoursToday, greaterThanOrEqualTo(0));
+      expect(provider.hosSummary.remainingDrivingToday, lessThanOrEqualTo(11));
+      expect(provider.hosSummary.complianceStatus, isNotEmpty);
+    });
+  });
+
+  group('CrashDetectionProvider', () {
+    late CrashDetectionProvider provider;
+
+    setUp(() {
+      provider = CrashDetectionProvider();
+    });
+
+    test('initializes with sample events', () {
+      expect(provider.events, isNotEmpty);
+    });
+
+    test('starts not monitoring', () {
+      expect(provider.isMonitoring, false);
+    });
+
+    test('toggles monitoring', () {
+      provider.startMonitoring();
+      expect(provider.isMonitoring, true);
+      provider.stopMonitoring();
+      expect(provider.isMonitoring, false);
+    });
+
+    test('reports a crash', () {
+      final initialCount = provider.events.length;
+      provider.reportCrash(
+        vehicleId: 'VH-001',
+        driverName: 'Test Driver',
+        latitude: 39.78,
+        longitude: -89.65,
+        impactForceG: 4.5,
+        speedAtImpact: 45.0,
+        severity: CrashSeverity.moderate,
+      );
+      expect(provider.events.length, initialCount + 1);
+      expect(provider.activeCrash, isNotNull);
+      expect(provider.countdownRemaining, isNotNull);
+    });
+
+    test('cancels alert (false alarm)', () {
+      provider.reportCrash(
+        vehicleId: 'VH-001',
+        driverName: 'Test',
+        latitude: 39.78,
+        longitude: -89.65,
+        impactForceG: 3.5,
+        speedAtImpact: 30.0,
+        severity: CrashSeverity.minor,
+      );
+      provider.cancelAlert();
+      expect(provider.activeCrash, isNull);
+      expect(provider.countdownRemaining, isNull);
+      expect(provider.events.first.status, CrashAlertStatus.falseAlarm);
+    });
+
+    test('acknowledges crash event', () {
+      provider.reportCrash(
+        vehicleId: 'VH-002',
+        driverName: 'Test',
+        latitude: 39.78,
+        longitude: -89.65,
+        impactForceG: 5.0,
+        speedAtImpact: 55.0,
+        severity: CrashSeverity.severe,
+      );
+      final crashId = provider.activeCrash!.id;
+      provider.acknowledgeAlert(crashId);
+      final event = provider.events.firstWhere((e) => e.id == crashId);
+      expect(event.status, CrashAlertStatus.acknowledged);
+      expect(event.respondedAt, isNotNull);
+    });
+
+    test('updates settings', () {
+      provider.updateSettings(const CrashDetectionSettings(
+        isEnabled: false,
+        sensitivityThreshold: 5.0,
+        autoAlert911: false,
+        autoAlertDispatch: true,
+        countdownSeconds: 60,
+        emergencyContacts: ['555-0000'],
+      ));
+      expect(provider.settings.isEnabled, false);
+      expect(provider.settings.sensitivityThreshold, 5.0);
+      expect(provider.settings.countdownSeconds, 60);
+    });
+  });
+
+  group('DashCamProvider', () {
+    late DashCamProvider provider;
+
+    setUp(() {
+      provider = DashCamProvider();
+    });
+
+    test('initializes with sample devices and clips', () {
+      expect(provider.devices, isNotEmpty);
+      expect(provider.clips, isNotEmpty);
+    });
+
+    test('gets clips for vehicle', () {
+      final clips = provider.getClipsForVehicle('VH-001');
+      expect(clips, isNotEmpty);
+      expect(clips.every((c) => c.vehicleId == 'VH-001'), true);
+    });
+
+    test('requests a new clip', () {
+      final initialCount = provider.clips.length;
+      provider.requestClip('VH-001', type: ClipType.manualCapture);
+      expect(provider.clips.length, initialCount + 1);
+      expect(provider.clips.first.clipType, ClipType.manualCapture);
+      expect(provider.clips.first.status, ClipStatus.recording);
+    });
+
+    test('deletes a clip', () {
+      final initialCount = provider.clips.length;
+      final clipId = provider.clips.first.id;
+      provider.deleteClip(clipId);
+      expect(provider.clips.length, initialCount - 1);
+    });
+
+    test('syncs devices', () {
+      provider.syncDevices();
+      expect(provider.isSyncing, true);
+    });
+  });
+
+  group('RoadsideAssistanceProvider', () {
+    late RoadsideAssistanceProvider provider;
+
+    setUp(() {
+      provider = RoadsideAssistanceProvider();
+    });
+
+    test('initializes with sample requests', () {
+      expect(provider.requests, isNotEmpty);
+    });
+
+    test('has active and completed requests', () {
+      expect(provider.activeRequests, isNotEmpty);
+    });
+
+    test('creates a new request', () {
+      final initialCount = provider.requests.length;
+      provider.createRequest(
+        customerName: 'Test Customer',
+        customerPhone: '555-1234',
+        assistanceType: AssistanceType.jumpStart,
+        latitude: 39.78,
+        longitude: -89.65,
+        address: '123 Test St',
+        vehicleDescription: '2020 Honda Civic',
+      );
+      expect(provider.requests.length, initialCount + 1);
+      expect(provider.requests.first.customerName, 'Test Customer');
+      expect(provider.requests.first.status, RequestStatus.requested);
+    });
+
+    test('assigns a driver', () {
+      final reqId = provider.activeRequests.first.id;
+      provider.assignDriver(reqId, 'driver-99', 'Test Driver');
+      final updated = provider.getRequestById(reqId);
+      expect(updated?.assignedDriverName, 'Test Driver');
+      expect(updated?.status, RequestStatus.dispatched);
+    });
+
+    test('updates status', () {
+      final reqId = provider.activeRequests.first.id;
+      provider.updateStatus(reqId, RequestStatus.enRoute);
+      expect(provider.getRequestById(reqId)?.status, RequestStatus.enRoute);
+    });
+
+    test('completes a request', () {
+      final reqId = provider.activeRequests.first.id;
+      provider.completeRequest(reqId, finalCost: 150.0);
+      final updated = provider.getRequestById(reqId);
+      expect(updated?.status, RequestStatus.completed);
+      expect(updated?.completedAt, isNotNull);
+    });
+
+    test('cancels a request', () {
+      final reqId = provider.activeRequests.first.id;
+      provider.cancelRequest(reqId);
+      expect(provider.getRequestById(reqId)?.status, RequestStatus.cancelled);
+    });
+  });
+
+  group('MaintenanceProvider', () {
+    late MaintenanceProvider provider;
+
+    setUp(() {
+      provider = MaintenanceProvider();
+    });
+
+    test('initializes with sample records', () {
+      expect(provider.records, isNotEmpty);
+    });
+
+    test('adds a new record', () {
+      final initialCount = provider.records.length;
+      provider.addRecord(MaintenanceRecord(
+        id: 'maint-test',
+        vehicleId: 'VH-001',
+        vehicleLabel: 'Test Truck',
+        type: MaintenanceType.oilChange,
+        description: 'Test oil change',
+        scheduledDate: DateTime.now().add(const Duration(days: 7)),
+      ));
+      expect(provider.records.length, initialCount + 1);
+      expect(provider.records.first.id, 'maint-test');
+    });
+
+    test('completes a record', () {
+      final scheduled = provider.scheduledRecords;
+      if (scheduled.isNotEmpty) {
+        final id = scheduled.first.id;
+        provider.completeRecord(id, cost: 75.0, notes: 'Done');
+        final updated = provider.records.firstWhere((r) => r.id == id);
+        expect(updated.status, MaintenanceStatus.completed);
+        expect(updated.cost, 75.0);
+        expect(updated.completedDate, isNotNull);
+      }
+    });
+
+    test('cancels a record', () {
+      final scheduled = provider.scheduledRecords;
+      if (scheduled.isNotEmpty) {
+        final id = scheduled.first.id;
+        provider.cancelRecord(id);
+        final updated = provider.records.firstWhere((r) => r.id == id);
+        expect(updated.status, MaintenanceStatus.cancelled);
+      }
+    });
+
+    test('deletes a record', () {
+      final initialCount = provider.records.length;
+      final id = provider.records.first.id;
+      provider.deleteRecord(id);
+      expect(provider.records.length, initialCount - 1);
+    });
+
+    test('filters records by vehicle', () {
+      final vehicleRecords = provider.getRecordsForVehicle('VH-001');
+      expect(vehicleRecords.every((r) => r.vehicleId == 'VH-001'), true);
+    });
+
+    test('gets upcoming maintenance', () {
+      final upcoming = provider.getUpcomingMaintenance();
+      final now = DateTime.now();
+      final cutoff = now.add(const Duration(days: 30));
+      for (final r in upcoming) {
+        expect(r.scheduledDate.isAfter(now), true);
+        expect(r.scheduledDate.isBefore(cutoff), true);
+      }
+    });
+  });
+
+  group('AiAssistantProvider', () {
+    late AiAssistantProvider provider;
+
+    setUp(() {
+      provider = AiAssistantProvider();
+    });
+
+    test('initializes with welcome messages', () {
+      expect(provider.messages, isNotEmpty);
+      expect(
+          provider.messages.any((m) => m.role == MessageRole.assistant), true);
+    });
+
+    test('all capabilities are active by default', () {
+      expect(provider.activeCapabilities.length,
+          AssistantCapability.values.length);
+    });
+
+    test('sends a message', () {
+      final initialCount = provider.messages.length;
+      provider.sendMessage('Check my hours');
+      // User message should be added immediately
+      expect(provider.messages.length, initialCount + 1);
+      expect(provider.messages.last.role, MessageRole.user);
+      expect(provider.isProcessing, true);
+    });
+
+    test('clears chat and reloads welcome messages', () {
+      provider.sendMessage('test');
+      provider.clearChat();
+      // Should have welcome messages only
+      expect(provider.messages.any((m) => m.role == MessageRole.user), false);
+    });
+
+    test('toggles capabilities', () {
+      final initialCount = provider.activeCapabilities.length;
+      provider.toggleCapability(AssistantCapability.weatherAlert);
+      expect(provider.activeCapabilities.length, initialCount - 1);
+      provider.toggleCapability(AssistantCapability.weatherAlert);
+      expect(provider.activeCapabilities.length, initialCount);
     });
   });
 }
