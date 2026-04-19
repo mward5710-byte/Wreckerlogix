@@ -333,7 +333,7 @@ class _StatusButton extends StatelessWidget {
       case DutyStatus.driving:
         return 'Driving';
       case DutyStatus.onDutyNotDriving:
-        return 'On Duty\n(Not Dr.)';
+        return 'On Duty\n(Not Drv)';
     }
   }
 }

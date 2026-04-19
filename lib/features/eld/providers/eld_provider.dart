@@ -209,7 +209,7 @@ class EldProvider extends ChangeNotifier {
         timestamp: base.add(const Duration(hours: 15)),
         latitude: 39.7817,
         longitude: -89.6501,
-        odometerMiles: 102345.0,
+        odometerMiles: 102520.0,
         vehicleId: 'truck-07',
         annotation: 'Back at yard — paperwork',
       ),
