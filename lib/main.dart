@@ -14,6 +14,7 @@ import 'features/driver_panel/providers/driver_panel_provider.dart';
 import 'features/crash_detection/providers/crash_detection_provider.dart';
 import 'features/dash_cam/providers/dash_cam_provider.dart';
 import 'features/maintenance/providers/maintenance_provider.dart';
+import 'features/ai_assistant/providers/ai_assistant_provider.dart';
 import 'core/services/auth_service.dart';
 
 void main() async {
@@ -51,6 +52,7 @@ class WreckerLogixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CrashDetectionProvider()),
         ChangeNotifierProvider(create: (_) => DashCamProvider()),
         ChangeNotifierProvider(create: (_) => MaintenanceProvider()),
+        ChangeNotifierProvider(create: (_) => AiAssistantProvider()),
       ],
       child: MaterialApp.router(
         title: 'WreckerLogix',
