@@ -11,6 +11,7 @@ import '../../features/accounting/screens/create_invoice_screen.dart';
 import '../../features/notifications/screens/notification_screen.dart';
 import '../../features/driver_panel/screens/driver_panel_screen.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/landing_screen.dart';
 import '../screens/login_screen.dart';
 
 /// Centralized routing using GoRouter.
@@ -27,6 +28,10 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/landing',
+        builder: (context, state) => const LandingScreen(),
       ),
       GoRoute(
         path: '/dispatch',
