@@ -235,6 +235,7 @@ void main() {
 
     test('starts unauthenticated', () {
       expect(auth.isAuthenticated, false);
+      expect(auth.lastAuthMethod, isNull);
     });
 
     test('signs in successfully', () async {
@@ -242,6 +243,7 @@ void main() {
       expect(result, true);
       expect(auth.isAuthenticated, true);
       expect(auth.userEmail, 'test@test.com');
+      expect(auth.lastAuthMethod, AuthMethod.emailPassword);
     });
 
     test('signs out', () async {
@@ -249,6 +251,7 @@ void main() {
       await auth.signOut();
       expect(auth.isAuthenticated, false);
       expect(auth.userId, isNull);
+      expect(auth.lastAuthMethod, isNull);
     });
 
     test('registers a new user', () async {
@@ -257,6 +260,75 @@ void main() {
       expect(result, true);
       expect(auth.displayName, 'New User');
       expect(auth.role, 'driver');
+      expect(auth.lastAuthMethod, AuthMethod.emailPassword);
+    });
+  });
+
+  group('AuthService Apple Sign-In', () {
+    late AuthService auth;
+
+    setUp(() {
+      auth = AuthService();
+    });
+
+    test('signs in with Apple successfully', () async {
+      final result = await auth.signInWithApple();
+      expect(result, true);
+      expect(auth.isAuthenticated, true);
+      expect(auth.userId, 'apple-user-001');
+      expect(auth.displayName, 'Apple User');
+      expect(auth.lastAuthMethod, AuthMethod.apple);
+    });
+
+    test('Apple sign-in sets email to private relay', () async {
+      await auth.signInWithApple();
+      expect(auth.userEmail, contains('appleid.com'));
+    });
+
+    test('sign out clears Apple auth state', () async {
+      await auth.signInWithApple();
+      expect(auth.isAuthenticated, true);
+      await auth.signOut();
+      expect(auth.isAuthenticated, false);
+      expect(auth.lastAuthMethod, isNull);
+    });
+  });
+
+  group('AuthService Passkey', () {
+    late AuthService auth;
+
+    setUp(() {
+      auth = AuthService();
+    });
+
+    test('signs in with Passkey successfully', () async {
+      final result = await auth.signInWithPasskey();
+      expect(result, true);
+      expect(auth.isAuthenticated, true);
+      expect(auth.userId, 'passkey-user-001');
+      expect(auth.displayName, 'Passkey User');
+      expect(auth.lastAuthMethod, AuthMethod.passkey);
+      expect(auth.passkeyRegistered, true);
+    });
+
+    test('registers a passkey for authenticated user', () async {
+      await auth.signIn('test@test.com', 'password');
+      final result = await auth.registerPasskey();
+      expect(result, true);
+      expect(auth.passkeyRegistered, true);
+    });
+
+    test('cannot register passkey without signing in', () async {
+      final result = await auth.registerPasskey();
+      expect(result, false);
+      expect(auth.passkeyRegistered, false);
+    });
+
+    test('sign out clears Passkey auth state', () async {
+      await auth.signInWithPasskey();
+      await auth.signOut();
+      expect(auth.isAuthenticated, false);
+      expect(auth.lastAuthMethod, isNull);
     });
   });
 

@@ -41,6 +41,10 @@ dependencies:
   flutter_local_notifications: ^17.0.0
   shared_preferences: ^2.2.2
 
+  # Apple Sign-In & Passkey Auth
+  sign_in_with_apple: ^7.0.1
+  crypto: ^3.0.3
+
   # Icons
   cupertino_icons: ^1.0.6
 
