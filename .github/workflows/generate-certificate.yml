@@ -41,6 +41,16 @@ on:
         options:
           - generate-csr
           - package-p12
+      email:
+        description: 'Email for CSR (used in Phase 1 only)'
+        required: false
+        default: 'admin@wreckerlogix.com'
+        type: string
+      common_name:
+        description: 'Common name for CSR (used in Phase 1 only)'
+        required: false
+        default: 'WreckerLogix Distribution'
+        type: string
 
 permissions:
   contents: read
@@ -60,7 +70,7 @@ jobs:
           openssl req -new \
             -key ios_distribution.key \
             -out CertificateSigningRequest.certSigningRequest \
-            -subj "/emailAddress=admin@wreckerlogix.com/CN=WreckerLogix Distribution/C=US"
+            -subj "/emailAddress=${{ inputs.email }}/CN=${{ inputs.common_name }}/C=US"
 
           echo "✅ CSR generated successfully"
           echo ""
@@ -98,7 +108,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: signing-csr
-        continue-on-error: true
+        continue-on-error: false
 
       - name: Check for required inputs
         env:
@@ -125,7 +135,7 @@ jobs:
           base64 -d -i private_key.b64 -o ios_distribution.key
 
           # Decode the .cer from Apple
-          echo -n "$APPLE_CERTIFICATE_CER" | base64 --decode > ios_distribution.cer
+          echo "$APPLE_CERTIFICATE_CER" | base64 --decode > ios_distribution.cer
 
           # Convert .cer (DER) to .pem
           openssl x509 -inform DER -in ios_distribution.cer -out ios_distribution.pem
