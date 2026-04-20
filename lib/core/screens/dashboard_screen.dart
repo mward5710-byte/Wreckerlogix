@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import '../../features/notifications/providers/notification_provider.dart';
 import '../../features/driver_panel/providers/driver_panel_provider.dart';
+import '../../features/maintenance/providers/maintenance_provider.dart';
+import '../../features/crash_detection/providers/crash_detection_provider.dart';
 
 /// Main dashboard — hub for all WreckerLogix modules.
 class DashboardScreen extends StatelessWidget {
@@ -15,6 +17,12 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('WreckerLogix'),
         actions: [
+          // About / Founder page
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () => context.push('/about'),
+            tooltip: 'About the Founder',
+          ),
           // Notification bell with unread badge
           Consumer<NotificationProvider>(
             builder: (context, notifs, _) => Stack(
@@ -178,6 +186,58 @@ class DashboardScreen extends StatelessWidget {
                       onTap: () => context.push('/notifications'),
                     ),
                   ),
+                  _ModuleCard(
+                    title: 'ELD / HOS',
+                    subtitle: 'Hours of service logging',
+                    icon: Icons.timer_outlined,
+                    color: const Color(0xFF4527A0),
+                    onTap: () => context.push('/eld'),
+                  ),
+                  Consumer<CrashDetectionProvider>(
+                    builder: (context, crash, _) => _ModuleCard(
+                      title: 'Crash Detection',
+                      subtitle: crash.isMonitoring
+                          ? 'Monitoring active'
+                          : 'Auto-alert & safety',
+                      icon: Icons.health_and_safety,
+                      color: const Color(0xFFB71C1C),
+                      badgeCount: crash.activeCrash != null ? 1 : 0,
+                      onTap: () => context.push('/crash-detection'),
+                    ),
+                  ),
+                  _ModuleCard(
+                    title: 'Dash Cam',
+                    subtitle: 'Camera feeds & clips',
+                    icon: Icons.videocam,
+                    color: const Color(0xFF0D47A1),
+                    onTap: () => context.push('/dash-cam'),
+                  ),
+                  _ModuleCard(
+                    title: 'Roadside Assist',
+                    subtitle: 'Emergency assistance',
+                    icon: Icons.sos,
+                    color: const Color(0xFFFF6F00),
+                    onTap: () => context.push('/roadside-assistance'),
+                  ),
+                  Consumer<MaintenanceProvider>(
+                    builder: (context, maint, _) => _ModuleCard(
+                      title: 'Maintenance',
+                      subtitle: maint.overdueRecords.isNotEmpty
+                          ? '${maint.overdueRecords.length} overdue'
+                          : 'Vehicle maintenance',
+                      icon: Icons.build,
+                      color: const Color(0xFF795548),
+                      badgeCount: maint.overdueRecords.length,
+                      onTap: () => context.push('/maintenance'),
+                    ),
+                  ),
+                  _ModuleCard(
+                    title: 'AI Assistant',
+                    subtitle: 'Smart trucking help',
+                    icon: Icons.smart_toy,
+                    color: const Color(0xFF00695C),
+                    onTap: () => context.push('/ai-assistant'),
+                  ),
                 ],
               ),
             ),
@@ -220,6 +280,7 @@ class DashboardScreen extends StatelessWidget {
 
   int _getCrossAxisCount(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    if (width > 1200) return 4;
     if (width > 900) return 3;
     if (width > 600) return 2;
     return 2;

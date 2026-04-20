@@ -10,7 +10,15 @@ import '../../features/accounting/screens/accounting_screen.dart';
 import '../../features/accounting/screens/create_invoice_screen.dart';
 import '../../features/notifications/screens/notification_screen.dart';
 import '../../features/driver_panel/screens/driver_panel_screen.dart';
+import '../../features/eld/screens/eld_screen.dart';
+import '../../features/crash_detection/screens/crash_detection_screen.dart';
+import '../../features/dash_cam/screens/dash_cam_screen.dart';
+import '../../features/roadside_assistance/screens/roadside_assistance_screen.dart';
+import '../../features/maintenance/screens/maintenance_screen.dart';
+import '../../features/ai_assistant/screens/ai_assistant_screen.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/landing_screen.dart';
+import '../screens/founder_screen.dart';
 import '../screens/login_screen.dart';
 
 /// Centralized routing using GoRouter.
@@ -25,8 +33,16 @@ class AppRouter {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
+        path: '/about',
+        builder: (context, state) => const FounderScreen(),
+      ),
+      GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/landing',
+        builder: (context, state) => const LandingScreen(),
       ),
       GoRoute(
         path: '/dispatch',
@@ -73,6 +89,30 @@ class AppRouter {
       GoRoute(
         path: '/driver-panel',
         builder: (context, state) => const DriverPanelScreen(),
+      ),
+      GoRoute(
+        path: '/eld',
+        builder: (context, state) => const EldScreen(),
+      ),
+      GoRoute(
+        path: '/crash-detection',
+        builder: (context, state) => const CrashDetectionScreen(),
+      ),
+      GoRoute(
+        path: '/dash-cam',
+        builder: (context, state) => const DashCamScreen(),
+      ),
+      GoRoute(
+        path: '/roadside-assistance',
+        builder: (context, state) => const RoadsideAssistanceScreen(),
+      ),
+      GoRoute(
+        path: '/maintenance',
+        builder: (context, state) => const MaintenanceScreen(),
+      ),
+      GoRoute(
+        path: '/ai-assistant',
+        builder: (context, state) => const AiAssistantScreen(),
       ),
     ],
   );
