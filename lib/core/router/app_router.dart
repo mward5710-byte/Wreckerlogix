@@ -17,6 +17,7 @@ import '../../features/roadside_assistance/screens/roadside_assistance_screen.da
 import '../../features/maintenance/screens/maintenance_screen.dart';
 import '../../features/ai_assistant/screens/ai_assistant_screen.dart';
 import '../screens/dashboard_screen.dart';
+import '../screens/landing_screen.dart';
 import '../screens/login_screen.dart';
 
 /// Centralized routing using GoRouter.
@@ -33,6 +34,10 @@ class AppRouter {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/landing',
+        builder: (context, state) => const LandingScreen(),
       ),
       GoRoute(
         path: '/dispatch',
