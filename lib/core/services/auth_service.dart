@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'firebase_options.dart';
 
@@ -258,7 +260,7 @@ class AuthService extends ChangeNotifier {
   // ignore: unused_element
   static String _generateNonce([int length = 32]) {
     const charset = '0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._';
-    final values = List<int>.generate(length, (_) => DateTime.now().microsecond % charset.length);
+    final values = List<int>.generate(length, (_) => Random.secure().nextInt(charset.length));
     return values.map((x) => charset[x % charset.length]).join();
   }
 

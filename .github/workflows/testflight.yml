@@ -71,7 +71,7 @@ jobs:
 
       # Install Apple certificate and provisioning profile
       - name: Install Apple Certificate
-        if: secrets.APPLE_CERTIFICATES_P12 != ''
+        if: env.APPLE_CERTIFICATES_P12 != ''
         env:
           APPLE_CERTIFICATES_P12: ${{ secrets.APPLE_CERTIFICATES_P12 }}
           APPLE_CERTIFICATES_PASSWORD: ${{ secrets.APPLE_CERTIFICATES_PASSWORD }}
