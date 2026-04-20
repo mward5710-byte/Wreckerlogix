@@ -67,7 +67,7 @@ run: |
 run: flutter pub get
 
       # Install Apple certificate and provisioning profile
-      - name: Install Apple Certificate
+-name: Install Apple Certificate
         if: env.APPLE_CERTIFICATES_P12 != ''
         env:
           APPLE_CERTIFICATES_P12: ${{ secrets.APPLE_CERTIFICATES_P12 }}
