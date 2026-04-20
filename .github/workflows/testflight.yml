@@ -58,9 +58,13 @@ jobs:
 
       - name: Generate platform folders
         run: flutter create . --project-name wreckerlogix --org com.wreckerlogix
-
-      - name: Install dependencies
-        run: flutter pub get
+-name: Patch Podfile for iPhone 17 Pro Max
+shell: bash
+run: |
+sed -i "s/# platform :ios, '9.0'/platform :ios, '13.0'/g" ios/Podfile
+echo "Podfile patched to iOS 13.0"
+-name: Install dependencies
+run: flutter pub get
 
       # Install Apple certificate and provisioning profile
       - name: Install Apple Certificate
