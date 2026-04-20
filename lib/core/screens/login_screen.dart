@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 
-/// Login screen with email/password authentication.
+/// Login screen with email/password, Apple Sign-In, and Passkey authentication.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -40,6 +40,36 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go('/');
       } else {
         setState(() => _errorMessage = 'Invalid email or password');
+      }
+    }
+  }
+
+  Future<void> _handleAppleSignIn() async {
+    setState(() => _errorMessage = null);
+
+    final auth = context.read<AuthService>();
+    final success = await auth.signInWithApple();
+
+    if (mounted) {
+      if (success) {
+        context.go('/');
+      } else {
+        setState(() => _errorMessage = 'Apple Sign-In failed. Please try again.');
+      }
+    }
+  }
+
+  Future<void> _handlePasskeySignIn() async {
+    setState(() => _errorMessage = null);
+
+    final auth = context.read<AuthService>();
+    final success = await auth.signInWithPasskey();
+
+    if (mounted) {
+      if (success) {
+        context.go('/');
+      } else {
+        setState(() => _errorMessage = 'Passkey authentication failed. Please try again.');
       }
     }
   }
@@ -93,6 +123,72 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
 
+                  // ─── Sign in with Apple ───
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: auth.isLoading ? null : _handleAppleSignIn,
+                      icon: const Icon(Icons.apple, size: 24),
+                      label: const Text('Sign in with Apple'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                        backgroundColor:
+                            Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white.withAlpha(25)
+                                : Colors.black.withAlpha(10),
+                        side: BorderSide(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white54
+                              : Colors.black45,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // ─── Sign in with Passkey ───
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: auth.isLoading ? null : _handlePasskeySignIn,
+                      icon: const Icon(Icons.fingerprint, size: 24),
+                      label: const Text('Sign in with Passkey'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                        side: BorderSide(
+                          color: Theme.of(context).colorScheme.primary.withAlpha(128),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ─── Or divider ───
+                  Row(
+                    children: [
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text('or',
+                            style: Theme.of(context).textTheme.bodySmall),
+                      ),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // ─── Email / Password ───
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
