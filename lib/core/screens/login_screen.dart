@@ -59,8 +59,8 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.local_shipping, size: 80,
-                      color: Theme.of(context).colorScheme.primary),
+                  Icon(Icons.local_shipping,
+                      size: 80, color: Theme.of(context).colorScheme.primary),
                   const SizedBox(height: 16),
                   Text('WreckerLogix',
                       style: Theme.of(context)
@@ -71,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text('Sign in to your account',
                       style: Theme.of(context).textTheme.bodyLarge),
                   const SizedBox(height: 40),
-
                   if (_errorMessage != null)
                     Container(
                       padding: const EdgeInsets.all(12),
@@ -92,7 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -101,13 +99,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       prefixIcon: Icon(Icons.email_outlined),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter your email';
-                      if (!value.contains('@')) return 'Please enter a valid email';
+                      if (value == null || value.isEmpty)
+                        return 'Please enter your email';
+                      if (!value.contains('@'))
+                        return 'Please enter a valid email';
                       return null;
                     },
                   ),
                   const SizedBox(height: 16),
-
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -118,18 +117,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         icon: Icon(_obscurePassword
                             ? Icons.visibility
                             : Icons.visibility_off),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     validator: (value) {
-                      if (value == null || value.isEmpty) return 'Please enter your password';
-                      if (value.length < 6) return 'Password must be at least 6 characters';
+                      if (value == null || value.isEmpty)
+                        return 'Please enter your password';
+                      if (value.length < 6)
+                        return 'Password must be at least 6 characters';
                       return null;
                     },
                   ),
                   const SizedBox(height: 24),
-
                   SizedBox(
                     width: double.infinity,
                     height: 48,

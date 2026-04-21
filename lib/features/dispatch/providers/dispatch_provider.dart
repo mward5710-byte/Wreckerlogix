@@ -8,13 +8,17 @@ class DispatchProvider extends ChangeNotifier {
   String? _error;
 
   List<Job> get jobs => List.unmodifiable(_jobs);
-  List<Job> get pendingJobs => _jobs.where((j) => j.status == JobStatus.pending).toList();
-  List<Job> get activeJobs => _jobs.where((j) =>
-      j.status == JobStatus.assigned ||
-      j.status == JobStatus.enRoute ||
-      j.status == JobStatus.onScene ||
-      j.status == JobStatus.inProgress).toList();
-  List<Job> get completedJobs => _jobs.where((j) => j.status == JobStatus.completed).toList();
+  List<Job> get pendingJobs =>
+      _jobs.where((j) => j.status == JobStatus.pending).toList();
+  List<Job> get activeJobs => _jobs
+      .where((j) =>
+          j.status == JobStatus.assigned ||
+          j.status == JobStatus.enRoute ||
+          j.status == JobStatus.onScene ||
+          j.status == JobStatus.inProgress)
+      .toList();
+  List<Job> get completedJobs =>
+      _jobs.where((j) => j.status == JobStatus.completed).toList();
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -124,7 +128,8 @@ class DispatchProvider extends ChangeNotifier {
         assignedDriverId: 'driver-002',
         assignedDriverName: 'Jake Thompson',
         createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        assignedAt: DateTime.now().subtract(const Duration(hours: 2, minutes: 45)),
+        assignedAt:
+            DateTime.now().subtract(const Duration(hours: 2, minutes: 45)),
         completedAt: DateTime.now().subtract(const Duration(hours: 1)),
         estimatedCost: 95.00,
       ),

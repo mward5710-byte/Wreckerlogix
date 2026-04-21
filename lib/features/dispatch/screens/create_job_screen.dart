@@ -58,14 +58,14 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
       vehicleMake: _makeCtrl.text.trim(),
       vehicleModel: _modelCtrl.text.trim(),
       vehicleColor: _colorCtrl.text.trim(),
-      licensePlate: _plateCtrl.text.trim().isNotEmpty ? _plateCtrl.text.trim() : null,
+      licensePlate:
+          _plateCtrl.text.trim().isNotEmpty ? _plateCtrl.text.trim() : null,
       towType: _towType,
       priority: _priority,
       notes: _notesCtrl.text.trim().isNotEmpty ? _notesCtrl.text.trim() : null,
       createdAt: DateTime.now(),
-      estimatedCost: _costCtrl.text.isNotEmpty
-          ? double.tryParse(_costCtrl.text)
-          : null,
+      estimatedCost:
+          _costCtrl.text.isNotEmpty ? double.tryParse(_costCtrl.text) : null,
     );
 
     context.read<DispatchProvider>().createJob(job);
@@ -97,7 +97,6 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 24),
-
               _sectionTitle('Locations'),
               TextFormField(
                 controller: _pickupCtrl,
@@ -117,7 +116,6 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 validator: (v) => v == null || v.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 24),
-
               _sectionTitle('Vehicle Information'),
               Row(
                 children: [
@@ -127,7 +125,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                       controller: _yearCtrl,
                       decoration: const InputDecoration(labelText: 'Year *'),
                       keyboardType: TextInputType.number,
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -136,7 +135,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                     child: TextFormField(
                       controller: _makeCtrl,
                       decoration: const InputDecoration(labelText: 'Make *'),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -145,7 +145,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                     child: TextFormField(
                       controller: _modelCtrl,
                       decoration: const InputDecoration(labelText: 'Model *'),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                 ],
@@ -157,26 +158,28 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                     child: TextFormField(
                       controller: _colorCtrl,
                       decoration: const InputDecoration(labelText: 'Color *'),
-                      validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       controller: _plateCtrl,
-                      decoration: const InputDecoration(labelText: 'License Plate'),
+                      decoration:
+                          const InputDecoration(labelText: 'License Plate'),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
-
               _sectionTitle('Job Details'),
               DropdownButtonFormField<TowType>(
                 value: _towType,
                 decoration: const InputDecoration(labelText: 'Service Type'),
                 items: TowType.values.map((t) {
-                  return DropdownMenuItem(value: t, child: Text(_towTypeLabel(t)));
+                  return DropdownMenuItem(
+                      value: t, child: Text(_towTypeLabel(t)));
                 }).toList(),
                 onChanged: (v) => setState(() => _towType = v!),
               ),
@@ -206,7 +209,6 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
                 maxLines: 3,
               ),
               const SizedBox(height: 32),
-
               SizedBox(
                 width: double.infinity,
                 height: 48,
@@ -233,16 +235,26 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
 
   String _towTypeLabel(TowType type) {
     switch (type) {
-      case TowType.lightDuty: return 'Light Duty Tow';
-      case TowType.mediumDuty: return 'Medium Duty Tow';
-      case TowType.heavyDuty: return 'Heavy Duty Tow';
-      case TowType.flatbed: return 'Flatbed';
-      case TowType.motorcycle: return 'Motorcycle';
-      case TowType.winchOut: return 'Winch Out';
-      case TowType.lockout: return 'Lockout';
-      case TowType.jumpStart: return 'Jump Start';
-      case TowType.fuelDelivery: return 'Fuel Delivery';
-      case TowType.tireChange: return 'Tire Change';
+      case TowType.lightDuty:
+        return 'Light Duty Tow';
+      case TowType.mediumDuty:
+        return 'Medium Duty Tow';
+      case TowType.heavyDuty:
+        return 'Heavy Duty Tow';
+      case TowType.flatbed:
+        return 'Flatbed';
+      case TowType.motorcycle:
+        return 'Motorcycle';
+      case TowType.winchOut:
+        return 'Winch Out';
+      case TowType.lockout:
+        return 'Lockout';
+      case TowType.jumpStart:
+        return 'Jump Start';
+      case TowType.fuelDelivery:
+        return 'Fuel Delivery';
+      case TowType.tireChange:
+        return 'Tire Change';
     }
   }
 }

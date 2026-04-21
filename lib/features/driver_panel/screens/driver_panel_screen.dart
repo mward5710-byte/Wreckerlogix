@@ -154,8 +154,8 @@ class DriverPanelScreen extends StatelessWidget {
               Navigator.pop(ctx);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('CLOCK OUT',
-                style: TextStyle(color: Colors.white)),
+            child:
+                const Text('CLOCK OUT', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
