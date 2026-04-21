@@ -8,12 +8,16 @@ name: TestFlight Deploy
 # 2. Create an App ID in App Store Connect: com.wreckerlogix.app
 # 3. Create a provisioning profile for that App ID
 # 4. Add these GitHub Secrets (Settings → Secrets → Actions):
+#    - APPLE_TEAM_ID                : Your 10-char Apple Developer Team ID
 #    - APPLE_CERTIFICATES_P12       : Base64-encoded .p12 distribution cert
 #    - APPLE_CERTIFICATES_PASSWORD  : Password for the .p12 cert
 #    - APPLE_PROVISIONING_PROFILE   : Base64-encoded .mobileprovision file
 #    - APP_STORE_CONNECT_API_KEY    : App Store Connect API key (.p8 contents)
 #    - APP_STORE_CONNECT_ISSUER_ID  : Issuer ID from App Store Connect
 #    - APP_STORE_CONNECT_KEY_ID     : Key ID from App Store Connect
+#
+# APPLE_TEAM_ID: Go to developer.apple.com → Account → Membership details
+#   Copy the 10-character Team ID (e.g. ABCD123456)
 #
 # HOW TO GET THESE:
 #
@@ -69,6 +73,18 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Prepare ExportOptions.plist
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          cp ci/ExportOptions.plist ios/ExportOptions.plist
+          if [ -n "$APPLE_TEAM_ID" ]; then
+            sed -i '' "s/TEAM_ID_PLACEHOLDER/$APPLE_TEAM_ID/g" ios/ExportOptions.plist
+            echo "✅ ExportOptions.plist patched with Team ID: $APPLE_TEAM_ID"
+          else
+            echo "⚠️  APPLE_TEAM_ID not set — ExportOptions.plist uses placeholder (build will use no-codesign fallback)"
+          fi
+
       - name: Install Apple Certificate
         if: env.APPLE_CERTIFICATES_P12 != ''
         env:
@@ -95,10 +111,13 @@ jobs:
           cp $PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build iOS
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          if [ -f ios/ExportOptions.plist ]; then
+          if [ -n "$APPLE_TEAM_ID" ] && [ -f ios/ExportOptions.plist ]; then
             flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
           else
+            echo "⚠️  Signing secrets not configured — building without code signing"
             flutter build ios --release --no-codesign
           fi
 
@@ -140,6 +159,18 @@ jobs:
           echo "3. Tap Share → Add to Home Screen" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Option B — TestFlight (native app):**" >> $GITHUB_STEP_SUMMARY
-          echo "1. Add your signing secrets to GitHub (see workflow comments)" >> $GITHUB_STEP_SUMMARY
-          echo "2. Push a tag: git tag v1.0.0 && git push origin v1.0.0" >> $GITHUB_STEP_SUMMARY
-          echo "3. Open TestFlight on your iPhone → install WreckerLogix" >> $GITHUB_STEP_SUMMARY
+          echo "Add these 7 GitHub Secrets (Settings → Secrets → Actions), then push a tag:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret | Where to get it |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APPLE_TEAM_ID\` | developer.apple.com → Account → Membership |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APPLE_CERTIFICATES_P12\` | generate-certificate.yml Phase 2 summary |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APPLE_CERTIFICATES_PASSWORD\` | generate-certificate.yml Phase 2 summary |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APPLE_PROVISIONING_PROFILE\` | developer.apple.com → Profiles → base64 |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APP_STORE_CONNECT_KEY_ID\` | App Store Connect → Keys |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APP_STORE_CONNECT_ISSUER_ID\` | App Store Connect → Keys |" >> $GITHUB_STEP_SUMMARY
+          echo "| \`APP_STORE_CONNECT_API_KEY\` | .p8 file contents from App Store Connect |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "git tag v1.0.0 && git push origin v1.0.0" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
