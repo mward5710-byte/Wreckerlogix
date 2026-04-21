@@ -15,7 +15,8 @@ class GpsScreen extends StatelessWidget {
         actions: [
           Consumer<GpsProvider>(
             builder: (context, gps, _) => IconButton(
-              icon: Icon(gps.isTracking ? Icons.gps_fixed : Icons.gps_not_fixed),
+              icon:
+                  Icon(gps.isTracking ? Icons.gps_fixed : Icons.gps_not_fixed),
               onPressed: () {
                 if (gps.isTracking) {
                   gps.stopTracking();

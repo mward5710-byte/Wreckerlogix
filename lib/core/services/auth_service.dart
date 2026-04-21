@@ -71,7 +71,8 @@ class AuthService extends ChangeNotifier {
   }
 
   /// Register a new user.
-  Future<bool> register(String email, String password, String name, String role) async {
+  Future<bool> register(
+      String email, String password, String name, String role) async {
     _isLoading = true;
     notifyListeners();
 

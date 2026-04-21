@@ -189,7 +189,8 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         status.name.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        style:
+            TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -225,7 +226,8 @@ class _PriorityBadge extends StatelessWidget {
         Icon(icon, size: 14, color: color),
         const SizedBox(width: 2),
         Text(priority.name.toUpperCase(),
-            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+            style: TextStyle(
+                color: color, fontSize: 11, fontWeight: FontWeight.bold)),
       ],
     );
   }

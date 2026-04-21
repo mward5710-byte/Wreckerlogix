@@ -12,8 +12,9 @@ class NotificationProvider extends ChangeNotifier {
 
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
 
-  List<NotificationItem> get emergencyNotifications =>
-      _notifications.where((n) => n.type == NotificationType.emergency).toList();
+  List<NotificationItem> get emergencyNotifications => _notifications
+      .where((n) => n.type == NotificationType.emergency)
+      .toList();
 
   List<NotificationItem> get jobNotifications => _notifications
       .where((n) =>
