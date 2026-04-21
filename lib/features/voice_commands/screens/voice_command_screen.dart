@@ -95,10 +95,14 @@ class VoiceCommandScreen extends StatelessWidget {
                           height: vc.isListening ? 140 : 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: vc.isListening ? Colors.red : const Color(0xFF6A1B9A),
+                            color: vc.isListening
+                                ? Colors.red
+                                : const Color(0xFF6A1B9A),
                             boxShadow: [
                               BoxShadow(
-                                color: (vc.isListening ? Colors.red : const Color(0xFF6A1B9A))
+                                color: (vc.isListening
+                                        ? Colors.red
+                                        : const Color(0xFF6A1B9A))
                                     .withAlpha(100),
                                 blurRadius: vc.isListening ? 30 : 15,
                                 spreadRadius: vc.isListening ? 5 : 0,
@@ -128,10 +132,12 @@ class VoiceCommandScreen extends StatelessWidget {
 
               // Available commands reference
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.lightbulb_outline, size: 16, color: Colors.amber),
+                    const Icon(Icons.lightbulb_outline,
+                        size: 16, color: Colors.amber),
                     const SizedBox(width: 8),
                     Text('Available Commands',
                         style: TextStyle(
@@ -147,8 +153,8 @@ class VoiceCommandScreen extends StatelessWidget {
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    ...VoiceCommandTemplate.availableCommands.map((cmd) =>
-                        _CommandRefTile(template: cmd)),
+                    ...VoiceCommandTemplate.availableCommands
+                        .map((cmd) => _CommandRefTile(template: cmd)),
                     const SizedBox(height: 8),
                     if (vc.commandHistory.isNotEmpty) ...[
                       const Divider(),
@@ -159,8 +165,9 @@ class VoiceCommandScreen extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.grey[700])),
                       ),
-                      ...vc.commandHistory.take(5).map((cmd) =>
-                          _CommandHistoryTile(command: cmd)),
+                      ...vc.commandHistory
+                          .take(5)
+                          .map((cmd) => _CommandHistoryTile(command: cmd)),
                     ],
                   ],
                 ),
@@ -185,10 +192,14 @@ class _QuickCommandBar extends StatelessWidget {
       runSpacing: 8,
       alignment: WrapAlignment.center,
       children: [
-        _QuickChip(label: 'En route', onTap: () => vc.processCommand('en route')),
-        _QuickChip(label: 'On scene', onTap: () => vc.processCommand('on scene')),
-        _QuickChip(label: 'Completed', onTap: () => vc.processCommand('completed')),
-        _QuickChip(label: 'Take photo', onTap: () => vc.processCommand('take photo')),
+        _QuickChip(
+            label: 'En route', onTap: () => vc.processCommand('en route')),
+        _QuickChip(
+            label: 'On scene', onTap: () => vc.processCommand('on scene')),
+        _QuickChip(
+            label: 'Completed', onTap: () => vc.processCommand('completed')),
+        _QuickChip(
+            label: 'Take photo', onTap: () => vc.processCommand('take photo')),
       ],
     );
   }
