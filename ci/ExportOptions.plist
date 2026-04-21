@@ -37,7 +37,7 @@
     <key>uploadSymbols</key>
     <true/>
 
-    <!-- Bitcode is deprecated in Xcode 14+ and disabled by default -->
+    <!-- Bitcode was removed in Xcode 14 and is disabled by default -->
     <key>uploadBitcode</key>
     <false/>
 </dict>

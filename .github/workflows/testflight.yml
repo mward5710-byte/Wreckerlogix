@@ -128,14 +128,15 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
-          API_KEY_PATH=$RUNNER_TEMP/authkey.p8
-          echo "$APP_STORE_CONNECT_API_KEY" > $API_KEY_PATH
+          # altool expects the .p8 key at the standard path:
+          # ~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "$APP_STORE_CONNECT_API_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8
           xcrun altool --upload-app \
             --type ios \
             --file build/ios/ipa/*.ipa \
             --apiKey "$APP_STORE_CONNECT_KEY_ID" \
             --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
-            --apiInternalKey "$API_KEY_PATH" \
             || echo "⚠️ TestFlight upload requires signing secrets. See workflow comments for setup."
 
       - name: Upload IPA Artifact
