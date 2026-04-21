@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  ExportOptions.plist — iOS App Store export configuration for WreckerLogix.
+
+  This file is copied to ios/ExportOptions.plist by the TestFlight CI workflow
+  AFTER `flutter create .` generates the ios/ folder. The TEAM_ID_PLACEHOLDER
+  token is replaced at build time using the APPLE_TEAM_ID GitHub Secret.
+
+  To find your Team ID:
+    1. Go to developer.apple.com → Account → Membership details
+    2. Copy the 10-character Team ID (e.g. ABCD123456)
+    3. Add it as GitHub Secret: APPLE_TEAM_ID
+-->
+<plist version="1.0">
+<dict>
+    <!-- Export method: app-store uploads to TestFlight / App Store -->
+    <key>method</key>
+    <string>app-store</string>
+
+    <!-- Your Apple Developer Team ID (10-char, e.g. ABCD123456) -->
+    <key>teamID</key>
+    <string>TEAM_ID_PLACEHOLDER</string>
+
+    <!-- Manual signing: use the provisioning profile we install in CI -->
+    <key>signingStyle</key>
+    <string>manual</string>
+
+    <!-- Map bundle ID → provisioning profile name -->
+    <key>provisioningProfiles</key>
+    <dict>
+        <key>com.wreckerlogix.app</key>
+        <string>WreckerLogix Distribution</string>
+    </dict>
+
+    <!-- Include debug symbols for crash reporting -->
+    <key>uploadSymbols</key>
+    <true/>
+
+    <!-- Bitcode was removed in Xcode 14 and is disabled by default -->
+    <key>uploadBitcode</key>
+    <false/>
+</dict>
+</plist>
