@@ -11,6 +11,7 @@ import 'features/time_tracking/providers/time_tracking_provider.dart';
 import 'features/accounting/providers/accounting_provider.dart';
 import 'features/notifications/providers/notification_provider.dart';
 import 'features/driver_panel/providers/driver_panel_provider.dart';
+import 'features/fuel_cloud/providers/fuel_cloud_provider.dart';
 import 'core/services/auth_service.dart';
 
 void main() async {
@@ -45,6 +46,7 @@ class WreckerLogixApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AccountingProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => DriverPanelProvider()),
+        ChangeNotifierProvider(create: (_) => FuelCloudProvider()),
       ],
       child: MaterialApp.router(
         title: 'WreckerLogix',

@@ -166,6 +166,13 @@ class DashboardScreen extends StatelessWidget {
                     color: const Color(0xFF558B2F),
                     onTap: () => context.push('/accounting'),
                   ),
+                  _ModuleCard(
+                    title: 'FuelCloud',
+                    subtitle: 'Fuel transactions & costs',
+                    icon: Icons.local_gas_station,
+                    color: const Color(0xFF00695C),
+                    onTap: () => context.push('/fuel-cloud'),
+                  ),
                   Consumer<NotificationProvider>(
                     builder: (context, notifs, _) => _ModuleCard(
                       title: 'Notifications',
