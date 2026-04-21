@@ -11,7 +11,7 @@ name: TestFlight Deploy
 #    - APPLE_CERTIFICATES_P12       : Base64-encoded .p12 distribution cert
 #    - APPLE_CERTIFICATES_PASSWORD  : Password for the .p12 cert
 #    - APPLE_PROVISIONING_PROFILE   : Base64-encoded .mobileprovision file
-#    - APP_STORE_CONNECT_API_KEY    : App Store Connect API key (JSON)
+#    - APP_STORE_CONNECT_API_KEY    : App Store Connect API key (.p8 contents)
 #    - APP_STORE_CONNECT_ISSUER_ID  : Issuer ID from App Store Connect
 #    - APP_STORE_CONNECT_KEY_ID     : Key ID from App Store Connect
 #
@@ -58,23 +58,24 @@ jobs:
 
       - name: Generate platform folders
         run: flutter create . --project-name wreckerlogix --org com.wreckerlogix
--name: Patch Podfile for iPhone 17 Pro Max
-shell: bash
-run: |
-  sed -i "s/# platform :ios, '9.0'/platform :ios, '13.0'/g" ios/Podfile
-  echo "Podfile patched to iOS 13.0"
--name: Install dependencies
-run: flutter pub get
 
-      # Install Apple certificate and provisioning profile
--name:Install Apple Certificate
- if: env.APPLE_CERTIFICATES_P12 != ''
- env:
+      - name: Patch Podfile for iOS 13 minimum deployment target
+        shell: bash
+        run: |
+          sed -i '' "s/# platform :ios, '9.0'/platform :ios, '13.0'/g" ios/Podfile || true
+          sed -i '' "s/platform :ios, '12.0'/platform :ios, '13.0'/g" ios/Podfile || true
+          echo "Podfile patched to iOS 13.0"
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Install Apple Certificate
+        if: env.APPLE_CERTIFICATES_P12 != ''
+        env:
           APPLE_CERTIFICATES_P12: ${{ secrets.APPLE_CERTIFICATES_P12 }}
           APPLE_CERTIFICATES_PASSWORD: ${{ secrets.APPLE_CERTIFICATES_PASSWORD }}
           APPLE_PROVISIONING_PROFILE: ${{ secrets.APPLE_PROVISIONING_PROFILE }}
         run: |
-          # Create temporary keychain
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
           KEYCHAIN_PASSWORD=$(openssl rand -hex 12)
 
@@ -82,24 +83,25 @@ run: flutter pub get
           security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
 
-          # Import certificate
           CERT_PATH=$RUNNER_TEMP/certificate.p12
           echo -n "$APPLE_CERTIFICATES_P12" | base64 --decode > $CERT_PATH
           security import $CERT_PATH -P "$APPLE_CERTIFICATES_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
           security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
           security list-keychain -d user -s $KEYCHAIN_PATH
 
-          # Install provisioning profile
           PROFILE_PATH=$RUNNER_TEMP/profile.mobileprovision
           echo -n "$APPLE_PROVISIONING_PROFILE" | base64 --decode > $PROFILE_PATH
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PROFILE_PATH ~/Library/MobileDevice/Provisioning\ Profiles/
 
-      # Build iOS release
       - name: Build iOS
-        run: flutter build ipa --release --export-options-plist=ios/ExportOptions.plist 2>/dev/null || flutter build ios --release --no-codesign
+        run: |
+          if [ -f ios/ExportOptions.plist ]; then
+            flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+          else
+            flutter build ios --release --no-codesign
+          fi
 
-      # Upload to TestFlight (only if secrets are configured)
       - name: Upload to TestFlight
         if: env.APP_STORE_CONNECT_KEY_ID != ''
         env:
@@ -107,28 +109,30 @@ run: flutter pub get
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
+          API_KEY_PATH=$RUNNER_TEMP/authkey.p8
+          echo "$APP_STORE_CONNECT_API_KEY" > $API_KEY_PATH
           xcrun altool --upload-app \
             --type ios \
-            path: wreckerlogix/build/ios/ipa/*.ipa\
-            
-            build/ios/ipa/*.ipa \
+            --file build/ios/ipa/*.ipa \
             --apiKey "$APP_STORE_CONNECT_KEY_ID" \
             --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+            --apiInternalKey "$API_KEY_PATH" \
             || echo "⚠️ TestFlight upload requires signing secrets. See workflow comments for setup."
 
       - name: Upload IPA Artifact
-        path: wreckerlogix/build/ios/ipa/*.ipa\
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ios-ipa
           path: build/ios/ipa/*.ipa
-        if: always()
+          if-no-files-found: warn
 
       - name: Build Summary
         if: always()
         run: |
           echo "## 🚛 WreckerLogix iOS Build" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Getting this on your iPhone 17:" >> $GITHUB_STEP_SUMMARY
+          echo "### Getting this on your iPhone:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Option A — Web App (instant, no setup):**" >> $GITHUB_STEP_SUMMARY
           echo "1. Open Safari on your iPhone" >> $GITHUB_STEP_SUMMARY
