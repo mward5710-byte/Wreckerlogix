@@ -194,8 +194,8 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Row(
           children: [
-            Icon(Icons.local_shipping, size: 48,
-                color: Theme.of(context).colorScheme.primary),
+            Icon(Icons.local_shipping,
+                size: 48, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
