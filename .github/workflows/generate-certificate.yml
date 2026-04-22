@@ -10,22 +10,23 @@ name: Generate iOS Signing Certificate
 # Phase 1 — Generate CSR:
 #   1. Go to Actions → "Generate iOS Signing Certificate" → Run workflow
 #   2. Set mode to "generate-csr"
-#   3. Download the "signing-csr" artifact (contains CertificateSigningRequest.certSigningRequest)
-#   4. Go to developer.apple.com → Certificates → "+" → iOS Distribution
-#   5. Upload the CSR file from the artifact
-#   6. Download the resulting .cer file from Apple
+#   3. After the run completes, note the Run ID (numeric, from the page URL)
+#   4. Download the "signing-csr" artifact (contains CertificateSigningRequest.certSigningRequest)
+#   5. Go to developer.apple.com → Certificates → "+" → iOS Distribution
+#   6. Upload the CSR file from the artifact
+#   7. Download the resulting .cer file from Apple
 #
-# Phase 2 — Package .p12:
-#   1. Base64-encode the .cer file:
+# Phase 2 — Package .p12 (must run within 1 day of Phase 1):
+#   1. Base64-encode the .cer file Apple gave you:
 #      On any device: open terminal/shell and run:
 #        base64 -i ios_distribution.cer   (or use an online base64 encoder)
 #   2. Add the base64 string as GitHub Secret: APPLE_CERTIFICATE_CER
 #   3. Run this workflow again with mode "package-p12"
-#   4. Download the "signing-p12" artifact
-#   5. The workflow summary will show the base64 .p12 and a generated password
-#   6. Add as GitHub Secrets:
-#      - APPLE_CERTIFICATES_P12       → the base64 .p12 from the summary
-#      - APPLE_CERTIFICATES_PASSWORD  → the password from the summary
+#      Set "csr_run_id" to the Phase 1 Run ID noted above
+#   4. The workflow summary will show the base64 .p12 and a generated password
+#   5. Add as GitHub Secrets:
+#      - BUILD_CERTIFICATE_BASE64  → the base64 .p12 from the summary
+#      - P12_PASSWORD              → the password from the summary
 #
 # ⚠️  SECURITY: The private key never leaves GitHub's macOS runner.
 #     Artifacts are encrypted at rest and expire after 1 day.
@@ -41,6 +42,11 @@ on:
         options:
           - generate-csr
           - package-p12
+      csr_run_id:
+        description: 'Phase 2 only: Run ID of the Phase 1 (generate-csr) run that uploaded the signing-csr artifact. Find it in the Actions tab URL for that run.'
+        required: false
+        default: ''
+        type: string
       email:
         description: 'Email for CSR (used in Phase 1 only)'
         required: false
@@ -54,6 +60,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   generate-csr:
@@ -76,13 +83,15 @@ jobs:
           echo ""
           echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Note this Run ID** — you will need it in Phase 2 (find it in the URL of this page)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "1. Download the **signing-csr** artifact below" >> $GITHUB_STEP_SUMMARY
           echo "2. Go to [developer.apple.com](https://developer.apple.com/account/resources/certificates/add)" >> $GITHUB_STEP_SUMMARY
           echo "3. Select **iOS Distribution** (or **Apple Distribution**)" >> $GITHUB_STEP_SUMMARY
           echo "4. Upload \`CertificateSigningRequest.certSigningRequest\` from the artifact" >> $GITHUB_STEP_SUMMARY
           echo "5. Download the \`.cer\` file Apple gives you" >> $GITHUB_STEP_SUMMARY
           echo "6. Base64-encode it and add as GitHub Secret \`APPLE_CERTIFICATE_CER\`" >> $GITHUB_STEP_SUMMARY
-          echo "7. Run this workflow again with mode **package-p12**" >> $GITHUB_STEP_SUMMARY
+          echo "7. Run this workflow again with mode **package-p12** and set **csr_run_id** to this run's ID" >> $GITHUB_STEP_SUMMARY
 
       - name: Cache private key for Phase 2
         run: |
@@ -104,10 +113,21 @@ jobs:
     if: inputs.mode == 'package-p12'
     runs-on: macos-latest
     steps:
+      - name: Validate csr_run_id input
+        run: |
+          if [ -z "${{ inputs.csr_run_id }}" ]; then
+            echo "❌ csr_run_id input is required for Phase 2."
+            echo "   Open the Actions tab, click the Phase 1 run, and copy the numeric run ID from the URL."
+            echo "   Example URL: .../actions/runs/12345678  →  csr_run_id = 12345678"
+            exit 1
+          fi
+
       - name: Download CSR artifact (contains private key)
         uses: actions/download-artifact@v4
         with:
           name: signing-csr
+          run-id: ${{ inputs.csr_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: false
 
       - name: Check for required inputs
@@ -132,10 +152,10 @@ jobs:
           APPLE_CERTIFICATE_CER: ${{ secrets.APPLE_CERTIFICATE_CER }}
         run: |
           # Decode the private key from Phase 1
-          base64 -d -i private_key.b64 -o ios_distribution.key
+          base64 -D -i private_key.b64 -o ios_distribution.key
 
           # Decode the .cer from Apple
-          echo "$APPLE_CERTIFICATE_CER" | base64 --decode > ios_distribution.cer
+          echo "$APPLE_CERTIFICATE_CER" | base64 -D > ios_distribution.cer
 
           # Convert .cer (DER) to .pem
           openssl x509 -inform DER -in ios_distribution.cer -out ios_distribution.pem
@@ -159,12 +179,12 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Go to **Settings → Secrets → Actions** and add:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### APPLE_CERTIFICATES_PASSWORD" >> $GITHUB_STEP_SUMMARY
+          echo "### P12_PASSWORD" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "$P12_PASSWORD" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### APPLE_CERTIFICATES_P12" >> $GITHUB_STEP_SUMMARY
+          echo "### BUILD_CERTIFICATE_BASE64" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "$P12_BASE64" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
