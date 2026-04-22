@@ -21,6 +21,8 @@ name: Generate iOS Signing Certificate
 #        base64 -i ios_distribution.cer   (or use an online base64 encoder)
 #   2. Add the base64 string as GitHub Secret: APPLE_CERTIFICATE_CER
 #   3. Run this workflow again with mode "package-p12"
+#      (optionally paste the Phase 1 run ID into the "csr_run_id" field;
+#       leave blank to auto-detect the most recent Phase 1 run)
 #   4. Download the "signing-p12" artifact
 #   5. The workflow summary will show the base64 .p12 and a generated password
 #   6. Add as GitHub Secrets:
@@ -51,9 +53,14 @@ on:
         required: false
         default: 'WreckerLogix Distribution'
         type: string
+      csr_run_id:
+        description: 'Run ID from the Phase 1 (generate-csr) run. Leave blank to auto-detect the most recent Phase 1 run. Find it in the URL of the Actions run page.'
+        required: false
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   generate-csr:
@@ -104,10 +111,40 @@ jobs:
     if: inputs.mode == 'package-p12'
     runs-on: macos-latest
     steps:
+      - name: Resolve Phase 1 run ID
+        id: resolve-run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -n "${{ inputs.csr_run_id }}" ]; then
+            echo "run_id=${{ inputs.csr_run_id }}" >> $GITHUB_OUTPUT
+            echo "Using provided run ID: ${{ inputs.csr_run_id }}"
+          else
+            echo "Auto-detecting most recent Phase 1 (generate-csr) run..."
+            RUN_ID=$(gh api \
+              "repos/${{ github.repository }}/actions/workflows/generate-certificate.yml/runs?status=success&per_page=20" \
+              --jq '[.workflow_runs[] | select(.display_title | test("generate-csr|Generate"; "i"))] | .[0].id // empty')
+            if [ -z "$RUN_ID" ]; then
+              # Fallback: just grab the most recent successful run of this workflow
+              RUN_ID=$(gh api \
+                "repos/${{ github.repository }}/actions/workflows/generate-certificate.yml/runs?status=success&per_page=5" \
+                --jq '.workflow_runs[0].id // empty')
+            fi
+            if [ -z "$RUN_ID" ]; then
+              echo "❌ Could not find a successful Phase 1 (generate-csr) run."
+              echo "Please run this workflow with mode 'generate-csr' first, then re-run with mode 'package-p12'."
+              exit 1
+            fi
+            echo "Found Phase 1 run ID: $RUN_ID"
+            echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          fi
+
       - name: Download CSR artifact (contains private key)
         uses: actions/download-artifact@v4
         with:
           name: signing-csr
+          run-id: ${{ steps.resolve-run.outputs.run_id }}
+          github-token: ${{ github.token }}
         continue-on-error: false
 
       - name: Check for required inputs
