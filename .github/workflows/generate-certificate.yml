@@ -20,10 +20,13 @@ name: Generate iOS Signing Certificate
 #      On any device: open terminal/shell and run:
 #        base64 -i ios_distribution.cer   (or use an online base64 encoder)
 #   2. Add the base64 string as GitHub Secret: APPLE_CERTIFICATE_CER
-#   3. Run this workflow again with mode "package-p12"
-#   4. Download the "signing-p12" artifact
-#   5. The workflow summary will show the base64 .p12 and a generated password
-#   6. Add as GitHub Secrets:
+#   3. Find the Run ID of your Phase 1 run:
+#      Go to Actions → "Generate iOS Signing Certificate" → click the Phase 1 run
+#      The run ID is the number at the end of the URL, e.g. .../runs/12345678
+#   4. Run this workflow again with mode "package-p12" and paste that Run ID
+#   5. Download the "signing-p12" artifact
+#   6. The workflow summary will show the base64 .p12 and a generated password
+#   7. Add as GitHub Secrets:
 #      - APPLE_CERTIFICATES_P12       → the base64 .p12 from the summary
 #      - APPLE_CERTIFICATES_PASSWORD  → the password from the summary
 #
@@ -51,9 +54,15 @@ on:
         required: false
         default: 'WreckerLogix Distribution'
         type: string
+      phase1_run_id:
+        description: 'Run ID of the Phase 1 (generate-csr) workflow run (used in Phase 2 only). Find it in the URL of the Phase 1 run, e.g. .../runs/12345678'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   generate-csr:
@@ -108,6 +117,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: signing-csr
+          run-id: ${{ inputs.phase1_run_id != '' && inputs.phase1_run_id || github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: false
 
       - name: Check for required inputs
