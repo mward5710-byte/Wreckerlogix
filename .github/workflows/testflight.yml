@@ -4,13 +4,16 @@ name: TestFlight Deploy
 # Builds WreckerLogix for iOS and uploads to TestFlight.
 #
 # SECRETS REQUIRED (Settings → Secrets and variables → Actions):
-#   - APP_STORE_CONNECT_API_KEY_ID      : Key ID from App Store Connect
-#   - APP_STORE_CONNECT_API_KEY_ISSUER_ID : Issuer ID from App Store Connect
-#   - APP_STORE_CONNECT_API_KEY_CONTENT : Contents of the .p8 key file
 #   - BUILD_CERTIFICATE_BASE64          : Base64-encoded .p12 distribution cert
 #   - P12_PASSWORD                      : Password for the .p12 cert
 #   - BUILD_PROVISION_PROFILE_BASE64    : Base64-encoded .mobileprovision file
 #   - KEYCHAIN_PASSWORD                 : Password for the temporary keychain
+#   - APP_STORE_CONNECT_API_KEY_ID      : Key ID from App Store Connect
+#   - APP_STORE_CONNECT_API_KEY_ISSUER_ID : Issuer ID from App Store Connect
+#   - APP_STORE_CONNECT_API_KEY_CONTENT : Contents of the .p8 key file
+#
+# Until those secrets are added, this workflow skips the macOS build
+# so the pipeline stays green rather than failing on every push.
 # ────────────────────────────────────────────────────────────────────
 
 on:
@@ -22,8 +25,44 @@ permissions:
   contents: read
 
 jobs:
+  # Fast ubuntu check — determines whether Apple signing secrets are present.
+  # The expensive macos build only runs when they are.
+  check-signing-secrets:
+    name: Check Apple Signing Secrets
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Detect signing secrets
+        id: check
+        env:
+          CERT: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+        run: |
+          if [[ -n "$CERT" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Apple signing secrets are present — TestFlight build will proceed."
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "ℹ️  Apple signing secrets are not yet configured — skipping TestFlight build."
+            echo ""
+            echo "  To enable automatic TestFlight deploys, add these 7 secrets under"
+            echo "  Settings → Secrets and variables → Actions:"
+            echo "    BUILD_CERTIFICATE_BASE64"
+            echo "    P12_PASSWORD"
+            echo "    BUILD_PROVISION_PROFILE_BASE64"
+            echo "    KEYCHAIN_PASSWORD"
+            echo "    APP_STORE_CONNECT_API_KEY_ID"
+            echo "    APP_STORE_CONNECT_API_KEY_ISSUER_ID"
+            echo "    APP_STORE_CONNECT_API_KEY_CONTENT"
+            echo ""
+            echo "  Use the Generate iOS Signing Certificate workflow to create the"
+            echo "  distribution certificate without needing a local Mac."
+          fi
+
   build-and-upload:
     name: Build iOS & Upload to TestFlight
+    needs: check-signing-secrets
+    if: needs.check-signing-secrets.outputs.configured == 'true'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
