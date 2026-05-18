@@ -88,8 +88,8 @@ class JobDetailScreen extends StatelessWidget {
                   title: 'Assignment',
                   icon: Icons.assignment_ind,
                   children: [
-                    _DetailRow('Driver',
-                        job.assignedDriverName ?? 'Unassigned'),
+                    _DetailRow(
+                        'Driver', job.assignedDriverName ?? 'Unassigned'),
                     _DetailRow('Priority', job.priority.name.toUpperCase()),
                     if (job.estimatedCost != null)
                       _DetailRow('Est. Cost',
@@ -208,7 +208,8 @@ class _SectionCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 20, color: Theme.of(context).colorScheme.primary),
+                Icon(icon,
+                    size: 20, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 Text(title,
                     style: const TextStyle(
@@ -266,8 +267,8 @@ class _JobTimeline extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.timeline, size: 20,
-                    color: Theme.of(context).colorScheme.primary),
+                Icon(Icons.timeline,
+                    size: 20, color: Theme.of(context).colorScheme.primary),
                 const SizedBox(width: 8),
                 const Text('Job Timeline',
                     style:
@@ -401,9 +402,7 @@ class _TimelineStep extends StatelessWidget {
                   height: isActive ? 20 : 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isCompleted || isActive
-                        ? color
-                        : Colors.grey[300],
+                    color: isCompleted || isActive ? color : Colors.grey[300],
                     border: isActive
                         ? Border.all(color: color.withAlpha(80), width: 3)
                         : null,
@@ -428,9 +427,8 @@ class _TimelineStep extends StatelessWidget {
                   Expanded(
                     child: Container(
                       width: 2,
-                      color: isCompleted && !isActive
-                          ? color
-                          : Colors.grey[300],
+                      color:
+                          isCompleted && !isActive ? color : Colors.grey[300],
                     ),
                   ),
               ],
@@ -447,12 +445,9 @@ class _TimelineStep extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontWeight:
-                          isActive ? FontWeight.bold : FontWeight.w500,
+                      fontWeight: isActive ? FontWeight.bold : FontWeight.w500,
                       fontSize: isActive ? 15 : 14,
-                      color: isCompleted || isActive
-                          ? color
-                          : Colors.grey[400],
+                      color: isCompleted || isActive ? color : Colors.grey[400],
                     ),
                   ),
                   const SizedBox(height: 2),

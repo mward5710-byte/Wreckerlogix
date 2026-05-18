@@ -44,8 +44,8 @@ class TimeEntry {
   double get totalHours {
     final end = clockOut ?? DateTime.now();
     final totalMinutes = end.difference(clockIn).inMinutes;
-    final breakMinutes = breaks.fold<int>(
-        0, (sum, b) => sum + b.durationMinutes);
+    final breakMinutes =
+        breaks.fold<int>(0, (sum, b) => sum + b.durationMinutes);
     return (totalMinutes - breakMinutes) / 60.0;
   }
 

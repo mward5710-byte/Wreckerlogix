@@ -27,7 +27,8 @@ class TimeTrackingScreen extends StatelessWidget {
 
                 // Shift history
                 const Text('Shift History',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 ...timeProv.entries.map((entry) => _ShiftCard(entry: entry)),
               ],
@@ -238,7 +239,8 @@ class _ShiftCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: entry.isActive ? Colors.green.shade100 : Colors.grey.shade100,
+          backgroundColor:
+              entry.isActive ? Colors.green.shade100 : Colors.grey.shade100,
           child: Icon(
             entry.isActive ? Icons.timer : Icons.check_circle,
             color: entry.isActive ? Colors.green : Colors.grey,

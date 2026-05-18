@@ -1,3 +1,6 @@
+// This file prevents `flutter create .` (used in CI to generate platform
+// folders) from overwriting it with a default that references `MyApp`.
+// The actual app entry point is WreckerLogixApp in lib/main.dart.
 // Basic widget test for WreckerLogix.
 // This file exists in the repo so that `flutter create .` (used in CI
 // to generate platform folders) does not overwrite it with a default
@@ -8,6 +11,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wreckerlogix/main.dart';
 
 void main() {
+  testWidgets('WreckerLogixApp smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const WreckerLogixApp());
   testWidgets('WreckerLogixApp renders', (WidgetTester tester) async {
     await tester.pumpWidget(const WreckerLogixApp());
     // App should render without errors and show title in the app bar or body.

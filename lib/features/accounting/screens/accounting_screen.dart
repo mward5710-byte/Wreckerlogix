@@ -47,20 +47,29 @@ class AccountingScreen extends StatelessWidget {
                 Row(
                   children: [
                     _InvoiceCountChip(
-                        label: 'Draft', count: acct.draftInvoices.length, color: Colors.grey),
+                        label: 'Draft',
+                        count: acct.draftInvoices.length,
+                        color: Colors.grey),
                     _InvoiceCountChip(
-                        label: 'Sent', count: acct.sentInvoices.length, color: Colors.blue),
+                        label: 'Sent',
+                        count: acct.sentInvoices.length,
+                        color: Colors.blue),
                     _InvoiceCountChip(
-                        label: 'Paid', count: acct.paidInvoices.length, color: Colors.green),
+                        label: 'Paid',
+                        count: acct.paidInvoices.length,
+                        color: Colors.green),
                     _InvoiceCountChip(
-                        label: 'Overdue', count: acct.overdueInvoices.length, color: Colors.red),
+                        label: 'Overdue',
+                        count: acct.overdueInvoices.length,
+                        color: Colors.red),
                   ],
                 ),
                 const SizedBox(height: 24),
 
                 // Invoices list
                 const Text('Invoices',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 ...acct.invoices.map((inv) => _InvoiceCard(
                       invoice: inv,
@@ -221,8 +230,7 @@ class _InvoiceCard extends StatelessWidget {
                 children: [
                   if (invoice.status == InvoiceStatus.draft)
                     OutlinedButton(
-                      onPressed: () =>
-                          onStatusChange(InvoiceStatus.sent),
+                      onPressed: () => onStatusChange(InvoiceStatus.sent),
                       child: const Text('Send'),
                     ),
                   const SizedBox(width: 8),
@@ -270,7 +278,8 @@ class _InvoiceStatusBadge extends StatelessWidget {
       ),
       child: Text(
         status.name.toUpperCase(),
-        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        style:
+            TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
       ),
     );
   }

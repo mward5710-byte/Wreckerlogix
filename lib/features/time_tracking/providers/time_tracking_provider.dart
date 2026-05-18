@@ -86,9 +86,10 @@ class TimeTrackingProvider extends ChangeNotifier {
 
   /// Total hours for the current week.
   double get weeklyHours {
-    final weekStart = DateTime.now().subtract(
-        Duration(days: DateTime.now().weekday - 1));
-    final startOfWeek = DateTime(weekStart.year, weekStart.month, weekStart.day);
+    final weekStart =
+        DateTime.now().subtract(Duration(days: DateTime.now().weekday - 1));
+    final startOfWeek =
+        DateTime(weekStart.year, weekStart.month, weekStart.day);
     return _entries
         .where((e) => e.clockIn.isAfter(startOfWeek))
         .fold(0.0, (sum, e) => sum + e.totalHours);
@@ -102,12 +103,15 @@ class TimeTrackingProvider extends ChangeNotifier {
         driverId: 'driver-001',
         driverName: 'Mike Rodriguez',
         clockIn: DateTime(yesterday.year, yesterday.month, yesterday.day, 7, 0),
-        clockOut: DateTime(yesterday.year, yesterday.month, yesterday.day, 16, 30),
+        clockOut:
+            DateTime(yesterday.year, yesterday.month, yesterday.day, 16, 30),
         status: ShiftStatus.completed,
         breaks: [
           BreakEntry(
-            start: DateTime(yesterday.year, yesterday.month, yesterday.day, 12, 0),
-            end: DateTime(yesterday.year, yesterday.month, yesterday.day, 12, 30),
+            start:
+                DateTime(yesterday.year, yesterday.month, yesterday.day, 12, 0),
+            end: DateTime(
+                yesterday.year, yesterday.month, yesterday.day, 12, 30),
           ),
         ],
       ),
@@ -116,7 +120,8 @@ class TimeTrackingProvider extends ChangeNotifier {
         driverId: 'driver-002',
         driverName: 'Jake Thompson',
         clockIn: DateTime(yesterday.year, yesterday.month, yesterday.day, 6, 0),
-        clockOut: DateTime(yesterday.year, yesterday.month, yesterday.day, 15, 0),
+        clockOut:
+            DateTime(yesterday.year, yesterday.month, yesterday.day, 15, 0),
         status: ShiftStatus.completed,
       ),
     ]);

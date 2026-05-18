@@ -1,9 +1,28 @@
 /// Represents a tow/recovery job in the dispatch system.
-enum JobStatus { pending, assigned, enRoute, onScene, inProgress, completed, cancelled }
+enum JobStatus {
+  pending,
+  assigned,
+  enRoute,
+  onScene,
+  inProgress,
+  completed,
+  cancelled
+}
 
 enum JobPriority { low, normal, high, emergency }
 
-enum TowType { lightDuty, mediumDuty, heavyDuty, flatbed, motorcycle, winchOut, lockout, jumpStart, fuelDelivery, tireChange }
+enum TowType {
+  lightDuty,
+  mediumDuty,
+  heavyDuty,
+  flatbed,
+  motorcycle,
+  winchOut,
+  lockout,
+  jumpStart,
+  fuelDelivery,
+  tireChange
+}
 
 class Job {
   final String id;
@@ -162,5 +181,6 @@ class Job {
     }
   }
 
-  String get vehicleDescription => '$vehicleYear $vehicleMake $vehicleModel ($vehicleColor)';
+  String get vehicleDescription =>
+      '$vehicleYear $vehicleMake $vehicleModel ($vehicleColor)';
 }
