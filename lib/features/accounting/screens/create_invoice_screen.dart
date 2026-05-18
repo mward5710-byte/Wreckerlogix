@@ -175,8 +175,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               child: TextFormField(
                                 controller: item.priceCtrl,
                                 decoration: const InputDecoration(
-                                    labelText: 'Unit Price',
-                                    prefixText: '\$ '),
+                                    labelText: 'Unit Price', prefixText: '\$ '),
                                 keyboardType: TextInputType.number,
                                 onChanged: (_) => setState(() {}),
                                 validator: (v) =>

@@ -18,13 +18,13 @@ class AccountingProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   /// Revenue totals
-  double get totalRevenue =>
-      _invoices.where((i) => i.status == InvoiceStatus.paid)
-          .fold(0.0, (sum, i) => sum + i.grandTotal);
-  double get totalOutstanding =>
-      _invoices.where((i) =>
+  double get totalRevenue => _invoices
+      .where((i) => i.status == InvoiceStatus.paid)
+      .fold(0.0, (sum, i) => sum + i.grandTotal);
+  double get totalOutstanding => _invoices
+      .where((i) =>
           i.status == InvoiceStatus.sent || i.status == InvoiceStatus.overdue)
-          .fold(0.0, (sum, i) => sum + i.grandTotal);
+      .fold(0.0, (sum, i) => sum + i.grandTotal);
 
   AccountingProvider() {
     _loadSampleData();

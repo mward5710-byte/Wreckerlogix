@@ -18,16 +18,14 @@ class PhotoDocScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.camera_alt_outlined, size: 80,
-                      color: Colors.grey[300]),
+                  Icon(Icons.camera_alt_outlined,
+                      size: 80, color: Colors.grey[300]),
                   const SizedBox(height: 16),
                   Text('No photos yet',
-                      style: TextStyle(
-                          fontSize: 18, color: Colors.grey[500])),
+                      style: TextStyle(fontSize: 18, color: Colors.grey[500])),
                   const SizedBox(height: 8),
                   Text('Capture vehicle photos for documentation',
-                      style: TextStyle(
-                          fontSize: 14, color: Colors.grey[400])),
+                      style: TextStyle(fontSize: 14, color: Colors.grey[400])),
                   const SizedBox(height: 24),
                   FilledButton.icon(
                     onPressed: () => _showCaptureDialog(context, photoProv),
@@ -172,12 +170,18 @@ class PhotoDocScreen extends StatelessWidget {
 
   String _photoTypeLabel(PhotoType type) {
     switch (type) {
-      case PhotoType.beforePickup: return 'Before Pickup';
-      case PhotoType.damage: return 'Damage';
-      case PhotoType.afterDropoff: return 'After Drop-off';
-      case PhotoType.scene: return 'Scene';
-      case PhotoType.receipt: return 'Receipt';
-      case PhotoType.other: return 'Other';
+      case PhotoType.beforePickup:
+        return 'Before Pickup';
+      case PhotoType.damage:
+        return 'Damage';
+      case PhotoType.afterDropoff:
+        return 'After Drop-off';
+      case PhotoType.scene:
+        return 'Scene';
+      case PhotoType.receipt:
+        return 'Receipt';
+      case PhotoType.other:
+        return 'Other';
     }
   }
 }
@@ -232,8 +236,8 @@ class _PhotoCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(4),
                       child: Text(photo.caption!,
-                          style: TextStyle(
-                              fontSize: 10, color: Colors.grey[600]),
+                          style:
+                              TextStyle(fontSize: 10, color: Colors.grey[600]),
                           textAlign: TextAlign.center),
                     ),
                 ],
@@ -251,7 +255,8 @@ class _PhotoCard extends StatelessWidget {
                 if (photo.latitude != null)
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 10, color: Colors.green),
+                      const Icon(Icons.location_on,
+                          size: 10, color: Colors.green),
                       const SizedBox(width: 2),
                       Text('Geotagged',
                           style: TextStyle(

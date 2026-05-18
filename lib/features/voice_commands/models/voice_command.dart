@@ -2,8 +2,10 @@
 class VoiceCommand {
   final String id;
   final String rawText;
-  final String? interpretedAction; // e.g., 'update_status', 'navigate_to', 'call_dispatch'
-  final Map<String, String> parameters; // e.g., {'status': 'on_scene', 'jobId': '123'}
+  final String?
+      interpretedAction; // e.g., 'update_status', 'navigate_to', 'call_dispatch'
+  final Map<String, String>
+      parameters; // e.g., {'status': 'on_scene', 'jobId': '123'}
   final double confidence;
   final DateTime timestamp;
   final bool executed;
@@ -62,7 +64,13 @@ class VoiceCommandTemplate {
     VoiceCommandTemplate(
       action: 'update_status_completed',
       description: 'Mark the job as completed',
-      triggerPhrases: ['completed', 'done', 'finished', 'delivered', 'dropped off'],
+      triggerPhrases: [
+        'completed',
+        'done',
+        'finished',
+        'delivered',
+        'dropped off'
+      ],
     ),
     VoiceCommandTemplate(
       action: 'call_dispatch',
@@ -72,12 +80,22 @@ class VoiceCommandTemplate {
     VoiceCommandTemplate(
       action: 'take_photo',
       description: 'Open camera for documentation',
-      triggerPhrases: ['take photo', 'take picture', 'open camera', 'snap photo'],
+      triggerPhrases: [
+        'take photo',
+        'take picture',
+        'open camera',
+        'snap photo'
+      ],
     ),
     VoiceCommandTemplate(
       action: 'read_job',
       description: 'Read current job details aloud',
-      triggerPhrases: ['read job', 'job details', 'what\'s the job', 'current job'],
+      triggerPhrases: [
+        'read job',
+        'job details',
+        'what\'s the job',
+        'current job'
+      ],
     ),
   ];
 }
